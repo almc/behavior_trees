@@ -1,0 +1,8 @@
+#goal definition
+int32 GOAL_
+---
+#result definition
+int32 RESULT_
+---
+#feedback
+int32 FEEDBACK_
