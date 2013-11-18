@@ -48,7 +48,8 @@ void ROSAction::executionThread()
 		}
 		r.sleep();		     // wait to match frequency
 	}
-
+	started_ = false;
+	
 	std::cout << "Destroying Thread" << std::endl;
 	// execution_thread_.join();
 }
