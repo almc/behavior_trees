@@ -1,4 +1,6 @@
-{
+[*
 	A ActionName
 	A ActionName
-}
+	A ActionName
+	A ActionName
+]

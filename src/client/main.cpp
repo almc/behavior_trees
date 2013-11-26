@@ -41,6 +41,7 @@ int main(int argc, char** argv)
 	while (ros::ok())
 	{
 		std::cout << "-------------- EXECUTE TREE --------------" << std::endl;
+		root.execute_reset_status();
 		root.execute();			// sending tick
 		get_keypressed();		// processing keystrokes
 		process_keypressed();

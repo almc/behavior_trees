@@ -11,6 +11,8 @@ ROSAction::ROSAction(std::string name) :
 	start_time_(ros::Time::now()),
 	elapsed_time_((ros::Duration) 0)
 {
+	feedback_.FEEDBACK_ = NODE_ERROR;
+	result_.RESULT_     = NODE_ERROR;
 	as_.registerGoalCallback(boost::bind(&ROSAction::goalCB, this));
 	as_.registerPreemptCallback(boost::bind(&ROSAction::preemptCB, this));
 	as_.start();
@@ -40,7 +42,8 @@ void ROSAction::executionThread()
 			ros::Duration dt = ros::Time::now() - t0;
 			t0 = ros::Time::now();
 			std::cout << "executing cb" << dt << std::endl;
-			executeCB(dt);	 // execute user personal code
+			if (executeCB(dt))	// execute user personal code
+				break;			// if finished exit fast
 		}
 		else
 		{
@@ -48,25 +51,29 @@ void ROSAction::executionThread()
 		}
 		r.sleep();		     // wait to match frequency
 	}
-	started_ = false;
-	
-	std::cout << "Destroying Thread" << std::endl;
+	std::cout << "About to Destroy Thread" << std::endl;
+	// set_feedback(NODE_ERROR);
+	// send_feedback();
+	stop();
 	// execution_thread_.join();
 }
 
 // called each time a goal is received
 void ROSAction::goalCB()
 {
-	std::cout << "%%%%%%%%%% goalCB %%%%%%%%%%" << std::endl;
+	std::cout << "****************************%%%%%%%%%% goalCB %%%%%%%%%%" << std::endl;
 	// could add conditions to accept goal or not
 	goal_ = as_.acceptNewGoal()->GOAL_;
-	// std::cout << "Received Goal: " << goal_ << std::endl;
+	std::cout << "Received Goal: " << goal_ << std::endl;
+
+	send_feedback();
 
 	bool started;		// is thread running?
 	{
 		boost::lock_guard<boost::mutex> lock(mutex_started_);
 		started = started_;
 	}
+	std::cout << "started: " << started << std::endl;
 	if (started)
 	{
 		if (goal_ > 0)	    // possitive tick
@@ -91,13 +98,14 @@ void ROSAction::goalCB()
 void ROSAction::preemptCB()
 {
 	std::cout << "%%%%%%%%%% preemptCB %%%%%%%%%%" << std::endl;
-	as_.setPreempted();
+	reset_timeout();
+	// as_.setPreempted();
 }
 
 // start thread
 void ROSAction::start()
 {
-	std::cout << "Starting Thread Now" << std::endl;
+	std::cout << "Executing Reset Callback Now" << std::endl;
 	resetCB();
 	{
 		boost::lock_guard<boost::mutex> lock(mutex_started_);
@@ -107,6 +115,7 @@ void ROSAction::start()
 		boost::lock_guard<boost::mutex> lock(mutex_active_);
 		active_ = true;
 	}
+	std::cout << "Starting Thread Now" << std::endl;
 	execution_thread_ = boost::thread(
 		boost::bind(&ROSAction::executionThread, this) );
 }
@@ -177,15 +186,33 @@ void ROSAction::reset_timeout()		// called from goalCB
 }
 
 // send partial feedback
-void ROSAction::send_feedback(STATE state)
+void ROSAction::send_feedback()
 {
-	feedback_.FEEDBACK_ = state;
+	std::cout << "Sending Feedback now" << std::endl;
+	boost::lock_guard<boost::mutex> lock(mutex_feedback_);
+	// feedback_.FEEDBACK_ = state;
 	as_.publishFeedback(feedback_);
 }
 
-// function called periodically at EXECUTION_FREQUENCY
-void ROSAction::send_result(STATE state)
+// send final result
+void ROSAction::send_result()
 {
-	result_.RESULT_ = state;
+	std::cout << "Sending Result now" << std::endl;
+	boost::lock_guard<boost::mutex> lock(mutex_result_);
+	// result_.RESULT_ = state;
 	as_.setSucceeded(result_);
+}
+
+// sets the feedback to a certain value before sent in callback
+void ROSAction::set_feedback(STATE state)
+{
+	boost::lock_guard<boost::mutex> lock(mutex_feedback_);
+	feedback_.FEEDBACK_ = state;
+}
+
+// sets the result to a certain value before sent in callback
+void ROSAction::set_result(STATE state)
+{
+	boost::lock_guard<boost::mutex> lock(mutex_result_);
+	result_.RESULT_ = state;
 }

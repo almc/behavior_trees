@@ -210,6 +210,7 @@ private:
 
 	std::string ros_node_name_;
 	bool finished_;
+	bool received_;
 	actionlib::SimpleActionClient<behavior_trees::ROSAction> ac_;
 	boost::mutex mutex_node_status_;
 	boost::mutex mutex_finished_;

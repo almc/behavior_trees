@@ -14,29 +14,34 @@ public:
 		{}
 
 	// the action succeeds automatically after 5 seconds
-	void executeCB(ros::Duration dt)
+	int executeCB(ros::Duration dt)
 		{
 			std::cout << "**ActionName -%- Executing Main Task, elapsed_time: "
 			          << dt.toSec() << std::endl;
+			std::cout << "**ActionName -%- elapsed_time: "
+			          << time_to_complete_.toSec() << std::endl;
 
 			time_to_complete_ += dt;
 
 			if (time_to_complete_.toSec() < 5)
 			{
-				feedback_.FEEDBACK_ = RUNNING;
+				set_feedback(RUNNING);
+				// feedback_.FEEDBACK_ = RUNNING;
+				// as_.publishFeedback(feedback_);
+				return 0;		// 'allows' this thread to continue running
 			}
 			else if (time_to_complete_.toSec() >= 5)
 			{
-				feedback_.FEEDBACK_ = FAILURE;
-				result_.RESULT_ = FAILURE;
-				as_.setSucceeded(result_);
-				stop();
+				set_feedback(SUCCESS);
+				// set_feedback(FAILURE);
+				// feedback_.FEEDBACK_ = FAILURE;
+				// as_.publishFeedback(feedback_);
+				// result_.RESULT_ = FAILURE;
+				// as_.setSucceeded(result_);
+				// stop();			// stop allows new threads to be created
+				return 1;		// 'forces' this thread to finish securely
 			}
-
-			std::cout << "**ActionName -%- elapsed_time: "
-			          << time_to_complete_.toSec() << std::endl;
-
-			as_.publishFeedback(feedback_);
+			return 0;
 		}
 
 	void resetCB()

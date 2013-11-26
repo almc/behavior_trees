@@ -50,7 +50,7 @@ void Node::execute_reset_status()
 	exec_child_ = first_child_;
 	for (int i = 0; i < number_children_; i++)
 	{
-		child_status_ = NODE_ERROR;
+		// child_status_ = NODE_ERROR; // unnecessary
 		exec_child_->execute_reset_status();
 		exec_child_ = exec_child_->next_brother_;
 	}
@@ -161,13 +161,18 @@ STATE NodeSelector::execute()
 	exec_child_ = first_child_;
 	for (int i = 0; i < number_children_; i++)
 	{
+		std::cout << "ticking child: " << i << std::endl;
 		child_status_ = exec_child_->execute();
+
+		std::cout << "child status for comparison: " << child_status_ << std::endl;
 		if (child_status_ == NODE_ERROR)
 			return node_status_ = NODE_ERROR;
 		else if (child_status_ == RUNNING)
 			return node_status_ = RUNNING;
 		else if (child_status_ == SUCCESS)
 			return node_status_ = SUCCESS;
+
+		std::cout << "pointing exec_child_ to next brother" << std::endl;
 		exec_child_ = exec_child_->get_next_brother();
 	}
 	return node_status_ = FAILURE;
@@ -334,26 +339,33 @@ NodeROS::NodeROS(Node* node, std::string name)
 void NodeROS::doneCb(const actionlib::SimpleClientGoalState& state,
                      const behavior_trees::ROSResultConstPtr& result)
 {
-	ROS_INFO("Finished in state [%s]", state.toString().c_str());
-	ROS_INFO("Answer: %i", result->RESULT_);
-	{
-		boost::lock_guard<boost::mutex> lock(mutex_finished_);
-		finished_ = true;
-	}
-	std::cout << "JeSUS christ, it is the END" << std::endl;
+	std::cout << "The Server is Finishing" << this << std::endl;
+	// ROS_INFO("Finished in state [%s]", state.toString().c_str());
+	// ROS_INFO("Answer: %i", result->RESULT_);
+
+	// {
+	// 	boost::lock_guard<boost::mutex> lock(mutex_finished_);
+	// 	finished_ = true;
+	// }
+
+	// std::cout << "******************************JeSUS christ, it is the END" << std::endl;
+	// received_ = true;
 }
 
 void NodeROS::activeCb()
 {
+	std::cout << "active callback at Node: " << this << std::endl;
 	ROS_INFO("Goal just went active");
 }
 
 void NodeROS::feedbackCb(const behavior_trees::ROSFeedbackConstPtr& feedback)
 {
+	std::cout << "Callback Feedback at Node: " << this << std::endl;
 	ROS_INFO("Got Feedback status: %i", feedback->FEEDBACK_);
 	// std::cout << "%%% cb var: " << node_status_ << std::endl;
-	boost::lock_guard<boost::mutex> lock(mutex_node_status_);
+	// boost::lock_guard<boost::mutex> lock(mutex_node_status_);
 	node_status_ = (STATE) feedback->FEEDBACK_;
+	received_ = true;
 }
 
 STATE NodeROS::execute()
@@ -365,8 +377,9 @@ STATE NodeROS::execute()
 	else
 	{
 		bool finished;
+		received_ = false;
 		{
-			boost::lock_guard<boost::mutex> lock(mutex_finished_);
+			// boost::lock_guard<boost::mutex> lock(mutex_finished_);
 			finished = finished_;
 		}
 		if (!finished)
@@ -380,11 +393,26 @@ STATE NodeROS::execute()
 			             boost::bind(&NodeROS::doneCb, this, _1, _2),
 			             boost::bind(&NodeROS::activeCb, this),
 			             boost::bind(&NodeROS::feedbackCb, this, _1));
+
+			std::cout << "Waiting for Feedback at Node: " << this << std::endl;
+			while (!received_)
+			{
+				// std::cout << "*";
+			}
+			std::cout << "Received Feedback at Node: " << this << std::endl;
 		}
 		{
-			boost::lock_guard<boost::mutex> lock(mutex_node_status_);
+			// boost::lock_guard<boost::mutex> lock(mutex_node_status_);
 			std::cout << "STATUS: " << node_status_ << std::endl;
 			return node_status_;
 		}
 	}
 }
+
+// enum STATE
+// {
+// 	FAILURE = 0,
+// 	SUCCESS = 1,
+// 	RUNNING = 2,
+// 	NODE_ERROR = 3
+// };

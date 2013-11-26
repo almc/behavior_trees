@@ -30,6 +30,8 @@ protected:
 	boost::mutex mutex_active_;
 	boost::mutex mutex_start_time_;
 	boost::mutex mutex_elapsed_time_;
+	boost::mutex mutex_feedback_;
+	boost::mutex mutex_result_;
 
 public:
 
@@ -73,13 +75,19 @@ public:
 	void reset_timeout();
 
 	// send partial feedback
-	void send_feedback(STATE state);
+	void send_feedback();
 
 	// send final result
-	void send_result(STATE state);
+	void send_result();
+
+	// sets the feedback to a certain value before sent in callback
+	void set_feedback(STATE state);
+
+	// sets the result to a certain value before sent in callback
+	void set_result(STATE state);
 
 	// function called periodically at EXECUTION_FREQUENCY
-	virtual void executeCB(ros::Duration dt) {}
+	virtual int executeCB(ros::Duration dt) { return 0; }
 
 	// called when the thread is started only
 	virtual void resetCB() {}
