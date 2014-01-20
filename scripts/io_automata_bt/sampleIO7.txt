@@ -1,0 +1,40 @@
+13
+1
+12
+2 2
+3 1
+4 1
+5 7
+6 7
+8 7
+8 1
+10 9
+10 1
+13 11
+13 12
+13 1
+1 1
+1 1
+2 f
+3 f
+4 6
+5 6
+7 6
+7 f
+9 8
+9 f
+12 10
+12 11
+12 f
+s f
+
+% explanation:
+% 1st line is n = the number of states in I.Q, i.e. the states are 1,...,n.
+% 2nd line is I.qinit, the initial state from 1,...,n
+% 3rd line is m = the number of symbols in the output alphabet I.Sigmaout, which are labeled 1,...,m. (1 corresponds e.g. to go_straight action, 2 to grab action, etc. -- we have to agree on these, please name them as you wish for now)
+% 4th to (4+n-1)th lines represent the part of I.delta that is I.Q \times {succ,fail} \rightarrow Q; it is always given on n lines, two columns. Read ith line as: while being in state i of the I/O automaton, in case of success, move the I/O automaton to the first state, in case of failure, move the I/O automaton to the second state on that line
+% 4+1th to (4+2n-1)th lines represent the part of I.delta that is I.Q \times {succ,fail} \rightarrow Sigmaout; it is always given on n lines, two columns. Read ith line as: while being in state i of the I/O automaton, in case of success, output the first action to be performed in T, in case of failure, output the second action given on that line
+
+%Particular example: Being in the state 2, in case of success of the last action, move to the state 5, output action 9; in case of failure of the last action, move to state 4, output action 8;
+
+with sel* and seq* the tick never travel backwards, only after the s/f goes back to the root. with sel and seq the tick can travel backwards if the action is preempted but we are not considering that. this means that all existing loops should wrap up exactly at the same poin (the root): if there are two or more loops that wrap up at different places, it is not possible. also, a node looping on itself casting the same action would require something like a decorator, or an infinitely deep tree / infinitely long sequence of the same action.
