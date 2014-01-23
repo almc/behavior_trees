@@ -1,6 +1,38 @@
-[*
-	A ActionName
-	A ActionName
-	A ActionName
-	A ActionName
-]
+V Q 1
+V P 0
+{*
+	[*
+		C Q = 1
+		{*
+			[*
+				C P = 0
+				d 2 Q P
+					A ActionName
+				D
+			]
+			[*
+				C P = 1
+				d 2 Q P
+					A ActionName
+				D
+			]
+		}
+	]
+	[*
+		C Q = 2
+		{*
+			[*
+				C P = 0
+				d 1 Q P
+					A ActionName
+				D
+			]
+			[*
+				C P = 1
+				d 1 Q P
+					A ActionName
+				D
+			]
+		}
+	]
+}

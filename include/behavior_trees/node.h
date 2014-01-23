@@ -216,6 +216,44 @@ private:
 	boost::mutex mutex_finished_;
 };
 
+class NodeCondition : public Node
+{
+public:
+	NodeCondition(Node* node, std::string varlabel,
+	              std::string relation, std::string constant);
+
+private:
+	inline NODE_TYPE get_node_type() { return CONDITION; }
+	inline std::string get_node_name() { return "Condition"; }
+	inline void set_condition_name(std::string name) { condition_name_ = name; }
+	inline std::string get_condition_name() { return condition_name_; }
+	STATE execute();
+
+	std::string condition_name_;
+	std::string varlabel_;
+	std::string relation_;
+	std::string constant_;
+};
+
+class NodeDecorator : public Node
+{
+public:
+	NodeDecorator(Node* node, std::string next_state, std::string curr_state,
+	              std::string prev_status);
+
+private:
+	inline NODE_TYPE get_node_type() { return DECORATOR; }
+	inline std::string get_node_name() { return "Decorator"; }
+	inline void set_decorator_name(std::string name) { decorator_name_ = name; }
+	inline std::string get_decorator_name() { return decorator_name_; }
+	STATE execute();
+
+	std::string decorator_name_;
+	std::string next_state_;
+	std::string curr_state_;
+	std::string prev_status_;
+};
+
 #endif
 
 // actionlib::SimpleClientGoalState state = ac_.getState();

@@ -1,25 +1,27 @@
 #include <iostream>
+// #include <vector>
 
 #include "behavior_trees/node.h"
 #include "behavior_trees/display.h"
+#include "behavior_trees/parser.h"
 
 // constructor for the root node
 Node::Node()
 {
-	depth_ = 0;
-	number_children_ = 0;
-	children_number_ = 0;
-	highlighted_ = false;
-	overwritten_ = false;
-	overwritten_result_ = NODE_ERROR;
-	node_status_ = NODE_ERROR;
-	child_status_ = NODE_ERROR;
-	first_child_ = NULL;
-	curr_child_ = NULL;
-	exec_child_ = NULL;
-	next_brother_ = NULL;
-	prev_brother_ = NULL;
-	parent_ = NULL;
+depth_ = 0;
+number_children_ = 0;
+children_number_ = 0;
+highlighted_ = false;
+overwritten_ = false;
+overwritten_result_ = NODE_ERROR;
+node_status_ = NODE_ERROR;
+child_status_ = NODE_ERROR;
+first_child_ = NULL;
+curr_child_ = NULL;
+exec_child_ = NULL;
+next_brother_ = NULL;
+prev_brother_ = NULL;
+parent_ = NULL;
 }
 
 // constructor for any node but root
@@ -342,13 +344,10 @@ void NodeROS::doneCb(const actionlib::SimpleClientGoalState& state,
 	std::cout << "The Server is Finishing" << this << std::endl;
 	// ROS_INFO("Finished in state [%s]", state.toString().c_str());
 	// ROS_INFO("Answer: %i", result->RESULT_);
-
 	// {
 	// 	boost::lock_guard<boost::mutex> lock(mutex_finished_);
 	// 	finished_ = true;
 	// }
-
-	// std::cout << "******************************JeSUS christ, it is the END" << std::endl;
 	// received_ = true;
 }
 
@@ -408,6 +407,122 @@ STATE NodeROS::execute()
 		}
 	}
 }
+
+NodeCondition::NodeCondition(Node* node, std::string varlabel,
+                             std::string relation, std::string constant)
+	: Node(node), varlabel_(varlabel), relation_(relation), constant_(constant)
+{}
+
+STATE NodeCondition::execute()
+{
+	std::cout << "Executing Condition" << std::endl;
+
+	if (relation_.compare("="))
+		std::cout << "it's equality" << std::endl;
+
+	unsigned int idx = 0;
+	for (std::vector<std::string>::iterator it = global_varname.begin();
+	     it != global_varname.end(); ++it)
+	{
+		if (*it == varlabel_)
+		{
+			std::cout << "found match " << idx << std::endl;
+			break;
+		}
+		idx++;
+	}
+	double val = global_varvalue.at(idx);
+	std::cout << "val" << val << std::endl;
+
+	switch (relation_.at(0))
+	{
+	case '=': return node_status_ = (val == std::stod(constant_))?
+			SUCCESS : FAILURE; break;
+	case '>': return node_status_ = (val >= std::stod(constant_))?
+			SUCCESS : FAILURE; break;
+	case '<': return node_status_ = (val <= std::stod(constant_))?
+			SUCCESS : FAILURE; break;
+	default: std::cout << "relation not implemented (choose =, >, <)"
+	                   << std::endl; break;
+	}
+	return node_status_ = NODE_ERROR;
+}
+
+NodeDecorator::NodeDecorator(Node* node, std::string next_state,
+                             std::string curr_state, std::string prev_status)
+	: Node(node), next_state_(next_state), curr_state_(curr_state),
+	  prev_status_(prev_status)
+{}
+
+STATE NodeDecorator::execute()
+{
+	std::cout << "Executing Decorator" << std::endl;
+
+	exec_child_ = first_child_;
+	child_status_ = exec_child_->execute();
+
+	if (child_status_ == SUCCESS)
+	{
+		unsigned int idx = 0;
+		for (std::vector<std::string>::iterator it = global_varname.begin();
+		     it != global_varname.end(); ++it)
+		{
+			if (*it == prev_status_)
+				break;
+			idx++;
+		}
+		// prev_status = success
+		global_varvalue[idx] = 0;
+		std::cout << "global_varvalue" << global_varvalue[idx] << std::endl;
+
+		idx = 0;
+		for (std::vector<std::string>::iterator it = global_varname.begin();
+		     it != global_varname.end(); ++it)
+		{
+			if (*it == curr_state_)
+				break;
+			idx++;
+		}
+		// curr_state = next_state
+		global_varvalue[idx] = std::stod(next_state_);
+		std::cout << "global_varvalue" << global_varvalue[idx] << std::endl;
+
+		return node_status_ = SUCCESS;
+	}
+	else if (child_status_ == FAILURE)
+	{
+		unsigned int idx = 0;
+		for (std::vector<std::string>::iterator it = global_varname.begin();
+		     it != global_varname.end(); ++it)
+		{
+			if (*it == prev_status_)
+				break;
+			idx++;
+		}
+		// prev_status = failure
+		global_varvalue[idx] = 1;
+		std::cout << "global_varvalue" << global_varvalue[idx] << std::endl;
+
+		idx = 0;
+		for (std::vector<std::string>::iterator it = global_varname.begin();
+		     it != global_varname.end(); ++it)
+		{
+			if (*it == curr_state_)
+				break;
+			idx++;
+		}
+		// curr_state = next_state
+		global_varvalue[idx] = std::stod(next_state_);
+		std::cout << "global_varvalue" << global_varvalue[idx] << std::endl;
+
+		return node_status_ = SUCCESS;
+	}
+	else if (child_status_ == RUNNING)
+		return node_status_ = RUNNING;
+	else
+		return node_status_ = NODE_ERROR;
+}
+
 
 // enum STATE
 // {

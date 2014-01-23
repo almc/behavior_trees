@@ -11,6 +11,7 @@
 NodeRoot root;					// the root of the bt
 Node *node_cursor = NULL;		// used for displaying bt
 Node *node = NULL;				// used for parsing bt
+extern bool run;
 
 int main(int argc, char** argv)
 {
@@ -40,6 +41,7 @@ int main(int argc, char** argv)
 	// start ticking the root of the tree at frequency: TICK_FREQUENCY
 	while (ros::ok())
 	{
+		std::cout << "**** run" << run << std::endl;
 		std::cout << "-------------- EXECUTE TREE --------------" << std::endl;
 		root.execute_reset_status();
 		root.execute();			// sending tick
@@ -48,6 +50,7 @@ int main(int argc, char** argv)
 		glut_process();			// update visualization
 		glutPostRedisplay();
 		ros::Duration(1.0/TICK_FREQUENCY).sleep();
+		std::cout << "**** run" << run << std::endl;
 	}
 
 	// missing to clear the dynamically allocated tree

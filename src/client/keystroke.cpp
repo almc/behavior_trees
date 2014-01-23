@@ -18,6 +18,8 @@ bool BACK_keypressed = false;
 bool BACK_keydown = false;
 bool PAUSE_keypressed = false;
 bool PAUSE_keydown = false;
+bool ESC_keypressed = false;
+bool ESC_keydown = false;
 bool S1_keypressed = false;
 bool S1_keydown = false;
 bool S2_keypressed = false;
@@ -86,6 +88,14 @@ int get_keypressed()
 		PAUSE_keypressed = false;
 	PAUSE_keydown = PAUSE_tmp;
 
+	// check for exit
+	bool ESC_tmp = keyStates[GLUT_KEY_ESC];
+	if( !ESC_keydown && ESC_tmp )
+		ESC_keypressed = true;
+	else
+		ESC_keypressed = false;
+	ESC_keydown = ESC_tmp;
+
 	// check for 1 (running)
 	bool S1_tmp = keyStates[GLUT_KEY_1];
 	if( !S1_keydown && S1_tmp )
@@ -110,10 +120,6 @@ int get_keypressed()
 		S3_keypressed = false;
 	S3_keydown = S3_tmp;
 
-	// check for exit
-	if (keyStates[GLUT_KEY_ESC])
-		run = false;
-
 	return 0;
 }
 
@@ -134,14 +140,19 @@ int process_keypressed()
 		std::cout << "Backspace button pressed" << std::endl;
 	if (PAUSE_keypressed)
 		std::cout << "Spacebar button pressed" << std::endl;
+	if (ESC_keypressed)
+		std::cout << "Escape button pressed" << std::endl;
 #endif
 
 	if (L_keypressed)
 		navigate_left();
+
 	if (R_keypressed)
 		navigate_right();
+
 	if (U_keypressed)
 		navigate_up();
+
 	if (D_keypressed)
 		navigate_down();
 
@@ -151,7 +162,11 @@ int process_keypressed()
 	if (BACK_keypressed)
 		reset_overwritten();
 
-	// if (PAUSE_keypressed)
+	if (PAUSE_keypressed)
+	{}
+
+	if (ESC_keypressed)
+		run = false;
 
 	// if (S1_keypressed)
 	// 	set_node_state(FAILURE);
