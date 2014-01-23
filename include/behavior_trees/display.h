@@ -14,7 +14,7 @@
 #define FULLSCREEN false
 #define SCREEN_POSITION_X 200
 #define SCREEN_POSITION_Y 200
-#define SCREEN_WIDTH 800
+#define SCREEN_WIDTH 1200
 #define SCREEN_HEIGHT 600 // (9.0/16)
 #define NODE_WIDTH 5
 #define NODE_HEIGHT 5

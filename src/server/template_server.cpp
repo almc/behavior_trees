@@ -32,8 +32,8 @@ public:
 			}
 			else if (time_to_complete_.toSec() >= 5)
 			{
-				// set_feedback(SUCCESS);
-				set_feedback(FAILURE);
+				set_feedback(SUCCESS);
+				// set_feedback(FAILURE);
 				// feedback_.FEEDBACK_ = FAILURE;
 				// as_.publishFeedback(feedback_);
 				// result_.RESULT_ = FAILURE;
