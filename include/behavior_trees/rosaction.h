@@ -7,6 +7,8 @@
 #include "behavior_trees/node.h"
 #include "behavior_trees/parameters.h"
 
+extern bool busy;
+
 class ROSAction
 {
 protected:

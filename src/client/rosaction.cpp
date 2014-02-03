@@ -2,6 +2,8 @@
 #include <behavior_trees/ROSAction.h>		// automatically generated actionlib header
 #include <boost/thread.hpp>
 
+bool busy = false;
+
 // construct action with: A name
 ROSAction::ROSAction(std::string name) :
 	as_(nh_, name, false),
@@ -31,6 +33,8 @@ void ROSAction::executionThread()
 	// while (as_.isPreemptRequested() || ros::ok())
 	while ( is_active() && ros::ok())
 	{
+		std::cout << "execution_thread_.get_id()" << execution_thread_.get_id() << std::endl;
+
 		bool active = timeout_check(); // check if tick was received
 		std::cout << "im active" << active << std::endl;
 		{
@@ -54,6 +58,7 @@ void ROSAction::executionThread()
 	std::cout << "About to Destroy Thread" << std::endl;
 	// set_feedback(NODE_ERROR);
 	// send_feedback();
+	std::cout << "----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
 	stop();
 	// execution_thread_.join();
 }
@@ -67,6 +72,12 @@ void ROSAction::goalCB()
 	std::cout << "Received Goal: " << goal_ << std::endl;
 
 	send_feedback();
+
+	if (!busy)
+	{
+		feedback_.FEEDBACK_ = NODE_ERROR;
+		result_.RESULT_     = NODE_ERROR;
+	}
 
 	bool started;		// is thread running?
 	{
@@ -116,6 +127,8 @@ void ROSAction::start()
 		active_ = true;
 	}
 	std::cout << "Starting Thread Now" << std::endl;
+	std::cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
+
 	execution_thread_ = boost::thread(
 		boost::bind(&ROSAction::executionThread, this) );
 }

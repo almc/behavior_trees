@@ -7,13 +7,13 @@ V P 0
 			[*
 				C P = 0
 				d 2 Q P
-					A ActionName
+					A MoveDown
 				D
 			]
 			[*
 				C P = 1
 				d 1 Q P
-					A ActionName
+					A Cycle
 				D
 			]
 		}
@@ -24,13 +24,13 @@ V P 0
 			[*
 				C P = 0
 				d 3 Q P
-					A ActionName
+					A MoveDown
 				D
 			]
 			[*
 				C P = 1
 				d 2 Q P
-					A ActionName
+					A MoveDown
 				D
 			]
 		}
@@ -40,252 +40,20 @@ V P 0
 		{*
 			[*
 				C P = 0
-				d 4 Q P
-					A ActionName
-				D
-			]
-			[*
-				C P = 1
-				d 3 Q P
-					A ActionName
-				D
-			]
-		}
-	]
-	[*
-		C Q = 4
-		{*
-			[*
-				C P = 0
-				d 5 Q P
-					A ActionName
-				D
-			]
-			[*
-				C P = 1
-				d 4 Q P
-					A ActionName
-				D
-			]
-		}
-	]
-	[*
-		C Q = 5
-		{*
-			[*
-				C P = 0
 				d 6 Q P
-					A ActionName
+					/
+						A BallTrackerBlue
+						[
+							A Walker
+							A HandMover2
+						]
+					|
 				D
 			]
 			[*
 				C P = 1
 				d 5 Q P
-					A ActionName
-				D
-			]
-		}
-	]
-	[*
-		C Q = 6
-		{*
-			[*
-				C P = 0
-				d 7 Q P
-					A ActionName
-				D
-			]
-			[*
-				C P = 1
-				d 14 Q P
-					A ActionName
-				D
-			]
-		}
-	]
-	[*
-		C Q = 7
-		{*
-			[*
-				C P = 0
-				d 8 Q P
-					A ActionName
-				D
-			]
-			[*
-				C P = 1
-				d 7 Q P
-					A ActionName
-				D
-			]
-		}
-	]
-	[*
-		C Q = 8
-		{*
-			[*
-				C P = 0
-				d 9 Q P
-					A ActionName
-				D
-			]
-			[*
-				C P = 1
-				d 8 Q P
-					A ActionName
-				D
-			]
-		}
-	]
-	[*
-		C Q = 9
-		{*
-			[*
-				C P = 0
-				d 10 Q P
-					A ActionName
-				D
-			]
-			[*
-				C P = 1
-				d 9 Q P
-					A ActionName
-				D
-			]
-		}
-	]
-	[*
-		C Q = 10
-		{*
-			[*
-				C P = 0
-				d 11 Q P
-					A ActionName
-				D
-			]
-			[*
-				C P = 1
-				d 10 Q P
-					A ActionName
-				D
-			]
-		}
-	]
-	[*
-		C Q = 11
-		{*
-			[*
-				C P = 0
-				d 12 Q P
-					A ActionName
-				D
-			]
-			[*
-				C P = 1
-				d 11 Q P
-					A ActionName
-				D
-			]
-		}
-	]
-	[*
-		C Q = 12
-		{*
-			[*
-				C P = 0
-				d 13 Q P
-					A ActionName
-				D
-			]
-			[*
-				C P = 1
-				d 12 Q P
-					A ActionName
-				D
-			]
-		}
-	]
-	[*
-		C Q = 13
-		{*
-			[*
-				C P = 0
-				d 1 Q P
-					A ActionName
-				D
-			]
-			[*
-				C P = 1
-				d 13 Q P
-					A ActionName
-				D
-			]
-		}
-	]
-	[*
-		C Q = 14
-		{*
-			[*
-				C P = 0
-				d 15 Q P
-					A ActionName
-				D
-			]
-			[*
-				C P = 1
-				d 14 Q P
-					A ActionName
-				D
-			]
-		}
-	]
-	[*
-		C Q = 15
-		{*
-			[*
-				C P = 0
-				d 16 Q P
-					A ActionName
-				D
-			]
-			[*
-				C P = 1
-				d 15 Q P
-					A ActionName
-				D
-			]
-		}
-	]
-	[*
-		C Q = 16
-		{*
-			[*
-				C P = 0
-				d 17 Q P
-					A ActionName
-				D
-			]
-			[*
-				C P = 1
-				d 16 Q P
-					A ActionName
-				D
-			]
-		}
-	]
-	[*
-		C Q = 17
-		{*
-			[*
-				C P = 0
-				d 1 Q P
-					A ActionName
-				D
-			]
-			[*
-				C P = 1
-				d 17 Q P
-					A ActionName
+					A MoveDown
 				D
 			]
 		}

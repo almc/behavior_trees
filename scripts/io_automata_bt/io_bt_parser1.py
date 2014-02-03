@@ -11,9 +11,9 @@ sigma_in  = range(0, 2)         # 0: fail, 1: succ
 sigma_out = range(1, int(f.readline()) + 1 )
 d_transi  = [[ None for x in range(2)] for y in range(n_states)]
 d_action  = [[ None for x in range(2)] for y in range(n_states)]
-action_l  = [ "ActionName" for x in sigma_out]
-# action_l  = [ "MoveRight", "MoveDown", "MoveLeft", "MoveUp", \
-#               "Grasp"    , "Drop"    , "Cycle"]
+# action_l  = [ "ActionName" for x in sigma_out]
+action_l  = [ "MoveRight", "MoveDown", "MoveLeft", "MoveUp", \
+               "Grasp"    , "BallThrower"    , "Cycle"]
 print action_l
 
 for i in range(n_states):
