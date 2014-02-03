@@ -1,61 +1,8 @@
-V Q 1
-V P 0
-{
-	[*
-		C Q = 1
-		{*
-			[*
-				C P = 0
-				d 2 Q P
-					A MoveDown
-				D
-			]
-			[*
-				C P = 1
-				d 1 Q P
-					A Cycle
-				D
-			]
-		}
-	]
-	[*
-		C Q = 2
-		{*
-			[*
-				C P = 0
-				d 3 Q P
-					A MoveDown
-				D
-			]
-			[*
-				C P = 1
-				d 2 Q P
-					A MoveDown
-				D
-			]
-		}
-	]
-	[*
-		C Q = 3
-		{*
-			[*
-				C P = 0
-				d 6 Q P
-					/
-						A BallTrackerBlue
-						[
-							A Walker
-							A HandMover2
-						]
-					|
-				D
-			]
-			[*
-				C P = 1
-				d 5 Q P
-					A MoveDown
-				D
-			]
-		}
-	]
-}
+/
+    A BallTrackerBlue
+    [*
+        A Walker
+        A HandMover
+        A BallThrower
+    ]
+|

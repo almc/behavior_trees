@@ -3,7 +3,6 @@
 #include <boost/thread.hpp>
 
 bool busy = false;
-
 // construct action with: A name
 ROSAction::ROSAction(std::string name) :
 	as_(nh_, name, false),
@@ -73,35 +72,45 @@ void ROSAction::goalCB()
 
 	send_feedback();
 
-	if (!busy)
+	// if (!busy)
+	// {
+	// 	feedback_.FEEDBACK_ = NODE_ERROR;
+	// 	result_.RESULT_     = NODE_ERROR;
+	// }
+
+	if (feedback_.FEEDBACK_ != SUCCESS &&
+	    feedback_.FEEDBACK_ != FAILURE)
+	{
+		bool started;		// is thread running?
+		{
+			boost::lock_guard<boost::mutex> lock(mutex_started_);
+			started = started_;
+		}
+		std::cout << "started: " << started << std::endl;
+		if (started)
+		{
+			if (goal_ > 0)	    // possitive tick
+				reset_timeout();
+			else if (goal_ < 0) // negative tick
+				stop();
+			else			    // neutral tick
+			{}
+		}
+		else
+		{
+			if (goal_ > 0)	    // possitive tick
+				start();
+			else if (goal_ < 0) // negative tick
+			{}
+			else			    // neutral tick
+			{}
+		}
+	}
+	if (feedback_.FEEDBACK_ == SUCCESS ||
+	    feedback_.FEEDBACK_ == FAILURE)
 	{
 		feedback_.FEEDBACK_ = NODE_ERROR;
 		result_.RESULT_     = NODE_ERROR;
-	}
-
-	bool started;		// is thread running?
-	{
-		boost::lock_guard<boost::mutex> lock(mutex_started_);
-		started = started_;
-	}
-	std::cout << "started: " << started << std::endl;
-	if (started)
-	{
-		if (goal_ > 0)	    // possitive tick
-			reset_timeout();
-		else if (goal_ < 0) // negative tick
-			stop();
-		else			    // neutral tick
-		{}
-	}
-	else
-	{
-		if (goal_ > 0)	    // possitive tick
-			start();
-		else if (goal_ < 0) // negative tick
-		{}
-		else			    // neutral tick
-		{}
 	}
 }
 
