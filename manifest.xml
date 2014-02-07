@@ -4,7 +4,7 @@
      behavior_trees
 
   </description>
-  <author>marzinotto, tjernberg</author>
+  <author>marzinotto, colledanchise, tjernberg</author>
   <license>GPLv2</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/behavior_trees</url>
@@ -14,11 +14,9 @@
   <depend package="actionlib"/>
   <depend package="actionlib_msgs"/>
   <depend package="roslib"/>
-  
+
   <export>
     <cpp cflags="-I${prefix}/include" lflags="${prefix}/lib/libbt_server.a"/>
   </export>
 
 </package>
-
-
