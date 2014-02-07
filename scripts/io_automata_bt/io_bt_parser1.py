@@ -1,4 +1,4 @@
-test_letter = "A"
+test_letter = "E"
 # io_filename = "sampleIO.txt"
 io_filename = "test" + test_letter + ".txt"
 bt_filename = "../../bt.txt"
@@ -13,7 +13,7 @@ d_transi  = [[ None for x in range(2)] for y in range(n_states)]
 d_action  = [[ None for x in range(2)] for y in range(n_states)]
 # action_l  = [ "ActionName" for x in sigma_out]
 action_l  = [ "MoveRight", "MoveDown", "MoveLeft", "MoveUp", \
-               "Grasp"    , "BallThrower"    , "Cycle"]
+              "MoveHand" , "BallThrower", "Cycle"]
 print action_l
 
 for i in range(n_states):
