@@ -11,9 +11,3 @@
 *.lai
 *.la
 *.a
-
-bin/
-build/
-msg/
-msg_gen/
-src/behavior_trees/
