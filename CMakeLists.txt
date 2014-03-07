@@ -15,7 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 # System dependencies are found with CMake's conventions
-find_package(Boost REQUIRED COMPONENTS system thread)
+find_package(Boost REQUIRED COMPONENTS system thread program_options)
 
 # Settings
 add_definitions(-Wall -g -O0 -Wno-deprecated -static -Bstatic -std=gnu++0x)
@@ -144,9 +144,9 @@ include_directories(
 file(GLOB_RECURSE SRC ${PROJECT_SOURCE_DIR}/src/client/*.cpp)
 
 add_executable(${PROJECT_NAME} ${SRC})
-target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${catkin_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
-add_executable(template_server src/server/template_server.cpp src/client/rosaction.cpp)
+add_executable(template_server src/server/template_server.cpp src/client/rosaction.cpp src/client/robot_config.cpp)
 target_link_libraries(template_server ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 add_library(bt_server STATIC ${PROJECT_SOURCE_DIR}/src/client/rosaction.cpp)

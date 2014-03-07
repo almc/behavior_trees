@@ -1,4 +1,5 @@
 #include "behavior_trees/rosaction.h"
+#include "behavior_trees/robot_config.h"
 
 // simple template to implement actions and conditions for the
 // platform being used, the execute callback is going to be
@@ -55,7 +56,13 @@ public:
 
 int main(int argc, char** argv)
 {
-	ros::init(argc, argv, "ActionName"); // name used for bt.txt
+	std::cout << "Hello, world!" << std::endl;
+	// specify which options are available as cmd line arguments
+	setupCmdLineReader();
+	// read agent id from command line parameters (--agent=mario)
+	std::string agent = readAgentFromCmdLine(argc, argv);
+	// initialize the behavior tree server node
+	ros::init(argc, argv, std::string("action_name") + "_" + agent); // name used for bt.txt
 	ActionName server(ros::this_node::getName());
 	ros::spin();
 	return 0;

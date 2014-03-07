@@ -4,6 +4,7 @@
 #include <sstream>
 #include <fstream>
 
+extern std::string agent;
 extern Node *node;
 bool action_detected    = false;
 bool condition_detected = false;
@@ -61,7 +62,7 @@ int process_substring(std::string sub)
 int parse_file(std::string name)
 {
 	std::string line;
-	std::ifstream file (name);
+	std::ifstream file ("data/" + name);
 	if (!file.is_open())
 	{
 		std::cout << "Couldn't Open File" << std::endl;
@@ -87,7 +88,7 @@ int parse_file(std::string name)
 				std::string actionname;
 				iss >> actionname;
 				std::cout << "ROS Action Detected: " << actionname << std::endl;
-				node = new NodeROS(node, actionname);
+				node = new NodeROS(node, actionname + "_" + agent);
 				node = node->get_parent();
 				action_detected = false;
 			}

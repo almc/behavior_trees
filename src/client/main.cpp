@@ -7,16 +7,26 @@
 #include "behavior_trees/display.h"
 #include "behavior_trees/keystroke.h"
 #include "behavior_trees/navigation.h"
+#include "behavior_trees/robot_config.h"
 
 NodeRoot root;					// the root of the bt
 Node *node_cursor = NULL;		// used for displaying bt
 Node *node = NULL;				// used for parsing bt
 extern bool run;
+std::string agent;
 
 int main(int argc, char** argv)
 {
+	std::cout << "Hello, world!" << std::endl;
+
+	// specify which options are available as cmd line arguments
+	setupCmdLineReader();
+
+	// read agent id from command line parameters (--agent=mario)
+	agent = readAgentFromCmdLine(argc, argv);
+
 	// initialize the behavior tree client node
-	ros::init(argc, argv, "behavior_tree");
+	ros::init(argc, argv, std::string("behavior_tree") + "_" + agent);
 
 	// initialize OpenGL engine for visualization
 	glut_setup(argc, argv);
@@ -27,7 +37,7 @@ int main(int argc, char** argv)
 
 	// create the bt from the file bt.txt (put on the path)
 	std::cout << "----------------- PARSE FILE -----------------" << std::endl;
-	parse_file("bt.txt");
+	parse_file(std::string("bt") + "_" + agent + ".txt");
 
 	// print the data parsed from the specification file
 	std::cout << "----------------- PRINT TREE -----------------" << std::endl;
