@@ -22,7 +22,7 @@ std::string readCmdLineOption(int argc, char** argv, std::string argument_name)
 	if (vm.count(argument_name))
 	{
 		return_string = vm[argument_name].as<std::string>();
-		// std::cout << argument_name << " was set to " << vm[argument_name] << std::endl;
+		std::cout << argument_name << " was set to " << return_string << std::endl;
 	}
 	else
 	{
