@@ -338,6 +338,7 @@ NodeROS::NodeROS(Node* node, std::string name)
 	std::cout << "ROS Client: " << ros_node_name_ << std::endl;
 	ROS_INFO("Waiting for the corresponding actuator server to start.");
 	ac_.waitForServer();
+	ROS_INFO("Actuator server started successfully.");
 }
 
 void NodeROS::doneCb(const actionlib::SimpleClientGoalState& state,
