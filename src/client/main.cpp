@@ -1,5 +1,6 @@
 #include <iostream>
 #include <unistd.h>
+#include <signal.h>
 
 #include "behavior_trees/parameters.h"
 #include "behavior_trees/node.h"
@@ -15,9 +16,20 @@ Node *node = NULL;				// used for parsing bt
 extern bool run;
 std::string agent;
 
+void signal_callback_handler(int signum)
+{
+	printf("Caught signal %d\n", signum);
+	// Cleanup and close up stuff here
+	// Terminate program
+	exit(signum);
+}
+
 int main(int argc, char** argv)
 {
 	std::cout << "Hello, world!" << std::endl;
+
+	// setup signal interrupt handler
+	signal(SIGINT, signal_callback_handler);
 
 	// specify which options are available as cmd line arguments
 	setupCmdLineReader();
