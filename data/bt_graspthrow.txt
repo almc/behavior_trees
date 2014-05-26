@@ -1,5 +1,5 @@
 /
-    A BallTrackerBlue
+    A BallTrackerRed
     [*
         A Walker
         A HandMover
