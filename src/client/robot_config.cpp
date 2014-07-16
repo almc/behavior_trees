@@ -1,4 +1,5 @@
 #include <behavior_trees/robot_config.h>
+#include <iostream>
 
 po::options_description desc("Allowed options");
 
