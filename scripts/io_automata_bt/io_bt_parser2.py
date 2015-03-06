@@ -10,7 +10,7 @@ print "#############################################################"
 # global variables & initialization
 ################################################################################
 
-exp_n       = "7"
+exp_n       = "4"
 io_filename = "sampleIO" + exp_n + ".txt"
 bt_filename = "sampleBT" + exp_n + ".txt"
 f = open(io_filename, 'r')
@@ -45,8 +45,8 @@ nest_sel = pyparsing.nestedExpr( '{', '}', content=cont_sel)
 
 # parameters to optionally reverse the order in which the states are checked,
 # and to choose if the sequence pass or the selector pass should be done first.
-reverse_states = True
-# reverse_states = False
+# reverse_states = True
+reverse_states = False
 order_seq_sel  = True
 # order_seq_sel  = False
 
@@ -122,9 +122,16 @@ def check_sequence(q_1, seq_action, seq_state, q_f, p):
     q1_4 = d_transi[idx_q2][1]
     q2_4 = d_transi[idx_q3][1]
     if a1_3 == a2_3 and q1_4 == q2_4: # check the actions and state are the same
-        print "action", a_1, "is in sequence with action", a_2
+        print "action", a_1, "is in post-sequence with action", a_2
+        question_pre = True
+        for idx_s, s in enumerate(states):
+            if s != q_2:
+                if d_transi[idx_s][0] == q_3 or d_transi[idx_s][1] == q_3:
+                    question_pre = False
+                    print "imposible", idx_s+1
         question = (raw_input("wish to simplify? (y/n)") == 'y')
-        if question:
+        # if question:
+        if question_pre:
             seq_action.append(a_2)
             seq_state.append (q_2)
 # comment the following line to prevent more than two actions to be
@@ -160,9 +167,16 @@ def check_selector(q_1, sel_action, sel_state, q_f, p):
     q1_4 = d_transi[idx_q2][0]
     q2_4 = d_transi[idx_q3][0]
     if a1_3 == a2_3 and q1_4 == q2_4: # check the actions and state are the same
-        print "action", a_1, "is in selector with action", a_2
+        print "action", a_1, "is in post-selector with action", a_2
+        question_pre = True
+        for idx_s, s in enumerate(states):
+            if s != q_2:
+                if d_transi[idx_s][0] == q_3 or d_transi[idx_s][1] == q_3:
+                    question_pre = False
+                    print "imposible", idx_s+1
         question = (raw_input("wish to simplify? (y/n)") == 'y')
-        if question:
+        # if question:
+        if question_pre:
             sel_action.append(a_2)
             sel_state.append (q_2)
 # comment the following line to prevent more than two actions to be
