@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <ros/package.h>
 
 extern std::vector<std::string> global_varname;
 extern std::vector<double>      global_varvalue;

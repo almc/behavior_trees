@@ -62,7 +62,9 @@ int process_substring(std::string sub)
 int parse_file(std::string name)
 {
 	std::string line;
-	std::ifstream file ("data/" + name);
+	std::string path = ros::package::getPath("behavior_trees");
+	std::ifstream file(path + "/data/" + name);
+	
 	if (!file.is_open())
 	{
 		std::cout << "Couldn't Open File" << std::endl;
