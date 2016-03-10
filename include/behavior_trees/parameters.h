@@ -9,7 +9,7 @@
 // algorithm. It relies on non-blocking functions to be placed inside
 // the execute callback.
 
-#define TICK_FREQUENCY       1.0  // Hz
+#define TICK_FREQUENCY       5.0  // Hz
 #define TIMEOUT_THRESHOLD    2.0  // seconds
 #define EXECUTION_FREQUENCY  10.0 // Hz
 
