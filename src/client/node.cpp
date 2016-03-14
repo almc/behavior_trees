@@ -52,6 +52,7 @@ void Node::execute_reset_status()
 	exec_child_ = first_child_;
 	for (int i = 0; i < number_children_; i++)
 	{
+		ROS_INFO("child %d", i);
 		// child_status_ = NODE_ERROR; // unnecessary
 		exec_child_->execute_reset_status();
 		exec_child_ = exec_child_->next_brother_;
@@ -372,6 +373,7 @@ void NodeROS::feedbackCb(const behavior_trees::ROSFeedbackConstPtr& feedback)
 
 STATE NodeROS::execute()
 {
+	std::cout << "NodeROS::execute()" << std::endl;
 	if (overwritten_)
 	{
 		return node_status_ = FAILURE; //overwritten_result_;
@@ -381,7 +383,7 @@ STATE NodeROS::execute()
 		bool finished;
 		received_ = false;
 		{
-			// boost::lock_guard<boost::mutex> lock(mutex_finished_);
+			boost::lock_guard<boost::mutex> lock(mutex_finished_);
 			finished = finished_;
 		}
 		if (!finished)
@@ -399,12 +401,13 @@ STATE NodeROS::execute()
 			std::cout << "Waiting for Feedback at Node: " << this << std::endl;
 			while (!received_)
 			{
+				sleep(0.01);
 				// std::cout << "*";
 			}
 			std::cout << "Received Feedback at Node: " << this << std::endl;
 		}
 		{
-			// boost::lock_guard<boost::mutex> lock(mutex_node_status_);
+			boost::lock_guard<boost::mutex> lock(mutex_node_status_);
 			std::cout << "STATUS: " << node_status_ << std::endl;
 			return node_status_;
 		}

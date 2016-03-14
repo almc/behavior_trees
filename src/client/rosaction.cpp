@@ -30,12 +30,12 @@ void ROSAction::executionThread()
 	ros::Time t0 = start_time_ = ros::Time::now();
 
 	// while (as_.isPreemptRequested() || ros::ok())
-	while ( is_active() && ros::ok())
+	while (is_active() && ros::ok())
 	{
 		std::cout << "execution_thread_.get_id()" << execution_thread_.get_id() << std::endl;
 
 		bool active = timeout_check(); // check if tick was received
-		std::cout << "im active" << active << std::endl;
+		std::cout << "im active: " << active << std::endl;
 		{
 			boost::lock_guard<boost::mutex> lock(mutex_active_);
 			active_ = active = active ? active_ : false;
@@ -45,8 +45,11 @@ void ROSAction::executionThread()
 			ros::Duration dt = ros::Time::now() - t0;
 			t0 = ros::Time::now();
 			std::cout << "executing cb" << dt << std::endl;
-			if (executeCB(dt))	// execute user personal code
-				break;			// if finished exit fast
+			if (executeCB(dt))	// execute user personal code if finished exit fast
+			{
+				std::cout << "callback returned!" << std::endl;
+				break;
+			}
 		}
 		else
 		{
@@ -55,11 +58,11 @@ void ROSAction::executionThread()
 		r.sleep();		     // wait to match frequency
 	}
 	std::cout << "About to Destroy Thread" << std::endl;
-	// set_feedback(NODE_ERROR);
-	// send_feedback();
 	std::cout << "----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
+	// set_feedback(NODE_ERROR);
+	sleep(1);
+	send_feedback();
 	stop();
-	// execution_thread_.join();
 }
 
 // called each time a goal is received
@@ -71,6 +74,8 @@ void ROSAction::goalCB()
 	std::cout << "Received Goal: " << goal_ << std::endl;
 
 	send_feedback();
+
+	std::cout << "Sent feedback from goalCB" << std::endl;
 
 	// if (!busy)
 	// {
@@ -92,7 +97,10 @@ void ROSAction::goalCB()
 			if (goal_ > 0)	    // possitive tick
 				reset_timeout();
 			else if (goal_ < 0) // negative tick
+			{
+				std::cout << "Got a negative tick" << std::endl;
 				stop();
+			}
 			else			    // neutral tick
 			{}
 		}
@@ -106,12 +114,19 @@ void ROSAction::goalCB()
 			{}
 		}
 	}
+
+	std::cout << "Feedback was success or failure " << std::endl;
+
 	if (feedback_.FEEDBACK_ == SUCCESS ||
 	    feedback_.FEEDBACK_ == FAILURE)
 	{
+		boost::lock_guard<boost::mutex> lock_b(mutex_feedback_);
+		boost::lock_guard<boost::mutex> lock_c(mutex_result_);
 		feedback_.FEEDBACK_ = NODE_ERROR;
 		result_.RESULT_     = NODE_ERROR;
 	}
+
+	std::cout << "survived to this point" << std::endl;
 }
 
 // called each time a goal is preempted
@@ -154,6 +169,7 @@ void ROSAction::stop()
 		boost::lock_guard<boost::mutex> lock(mutex_active_);
 		active_ = false;
 	}
+	std::cout << "Stopped successfully" << std::endl;
 	// execution_thread_.join();
 }
 
@@ -212,6 +228,7 @@ void ROSAction::send_feedback()
 {
 	std::cout << "Sending Feedback now" << std::endl;
 	boost::lock_guard<boost::mutex> lock(mutex_feedback_);
+	std::cout << "Sending Feedback: " << feedback_.FEEDBACK_ << std::endl;
 	// feedback_.FEEDBACK_ = state;
 	as_.publishFeedback(feedback_);
 }
