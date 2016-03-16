@@ -340,6 +340,9 @@ NodeROS::NodeROS(Node* node, std::string name)
 	ROS_INFO("Waiting for the corresponding actuator server to start.");
 	ac_.waitForServer();
 	ROS_INFO("Actuator server started successfully.");
+	received_ = false;
+	finished_ = false;
+	active_ = false;
 }
 
 void NodeROS::doneCb(const actionlib::SimpleClientGoalState& state,
@@ -359,6 +362,10 @@ void NodeROS::activeCb()
 {
 	std::cout << "active callback at Node: " << this << std::endl;
 	ROS_INFO("Goal just went active");
+	{
+		boost::lock_guard<boost::mutex> lock(mutex_active_);
+		active_ = true;
+	}
 }
 
 void NodeROS::feedbackCb(const behavior_trees::ROSFeedbackConstPtr& feedback)
@@ -366,9 +373,14 @@ void NodeROS::feedbackCb(const behavior_trees::ROSFeedbackConstPtr& feedback)
 	std::cout << "Callback Feedback at Node: " << this << std::endl;
 	ROS_INFO("Got Feedback status: %i", feedback->FEEDBACK_);
 	// std::cout << "%%% cb var: " << node_status_ << std::endl;
-	// boost::lock_guard<boost::mutex> lock(mutex_node_status_);
-	node_status_ = (STATE) feedback->FEEDBACK_;
-	received_ = true;
+	{
+		boost::lock_guard<boost::mutex> lock(mutex_node_status_);
+		node_status_ = (STATE) feedback->FEEDBACK_;
+	}
+	{
+		boost::lock_guard<boost::mutex> lock(mutex_received_);
+		received_ = true;
+	}
 }
 
 STATE NodeROS::execute()
@@ -381,17 +393,24 @@ STATE NodeROS::execute()
 	else
 	{
 		bool finished;
-		received_ = false;
+		// received_ = false;
 		{
 			boost::lock_guard<boost::mutex> lock(mutex_finished_);
 			finished = finished_;
 		}
-		if (!finished)
+
+		ROS_INFO("RECEIVED: %d", received_);
+		if (!finished && !received_)
 		{
 			std::cout << "Sending Goal Client: "
 			          << ros_node_name_ << std::endl;
 			behavior_trees::ROSGoal goal;
 			goal.GOAL_ = 1; // possitive tick
+
+			{
+				boost::lock_guard<boost::mutex> lock(mutex_active_);
+				active_ = false;
+			}
 
 			ac_.sendGoal(goal,
 			             boost::bind(&NodeROS::doneCb, this, _1, _2),
@@ -399,12 +418,16 @@ STATE NodeROS::execute()
 			             boost::bind(&NodeROS::feedbackCb, this, _1));
 
 			std::cout << "Waiting for Feedback at Node: " << this << std::endl;
-			while (!received_)
+			while (!received_ && !active_)
 			{
 				sleep(0.01);
 				// std::cout << "*";
 			}
 			std::cout << "Received Feedback at Node: " << this << std::endl;
+		}
+		{
+			boost::lock_guard<boost::mutex> lock(mutex_received_);
+			received_ = false;
 		}
 		{
 			boost::lock_guard<boost::mutex> lock(mutex_node_status_);
