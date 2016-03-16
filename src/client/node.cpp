@@ -52,6 +52,7 @@ void Node::execute_reset_status()
 	exec_child_ = first_child_;
 	for (int i = 0; i < number_children_; i++)
 	{
+		ROS_INFO("child %d", i);
 		// child_status_ = NODE_ERROR; // unnecessary
 		exec_child_->execute_reset_status();
 		exec_child_ = exec_child_->next_brother_;
@@ -159,12 +160,14 @@ NodeSelector::NodeSelector(Node* node)
 
 STATE NodeSelector::execute()
 {
+	set_highlighted(true);
 	std::cout << "Executing Selector" << std::endl;
 	exec_child_ = first_child_;
 	for (int i = 0; i < number_children_; i++)
 	{
 		std::cout << "ticking child: " << i << std::endl;
 		child_status_ = exec_child_->execute();
+		set_highlighted(false);
 
 		std::cout << "child status for comparison: " << child_status_ << std::endl;
 		if (child_status_ == NODE_ERROR)
@@ -186,11 +189,13 @@ NodeSequence::NodeSequence(Node* node)
 
 STATE NodeSequence::execute()
 {
+	set_highlighted(true);
 	std::cout << "Executing Sequence" << std::endl;
 	exec_child_ = first_child_;
 	for (int i = 0; i < number_children_; i++)
 	{
 		child_status_ = exec_child_->execute();
+		set_highlighted(false);
 		if (child_status_ == NODE_ERROR)
 			return node_status_ = NODE_ERROR;
 		else if (child_status_ == RUNNING)
@@ -207,6 +212,7 @@ NodeParallel::NodeParallel(Node* node)
 
 STATE NodeParallel::execute()
 {
+	set_highlighted(true);
 	int number_failure = 0;
 	int number_success = 0;
 	int number_error = 0;
@@ -215,6 +221,7 @@ STATE NodeParallel::execute()
 	for (int i = 0; i < number_children_; i++)
 	{
 		child_status_ = exec_child_->execute();
+		set_highlighted(false);
 		if (child_status_ == NODE_ERROR)
 			number_error++;
 		else if (child_status_ == FAILURE)
@@ -239,8 +246,10 @@ STATE NodeRoot::execute()
 	// have a timeout to become NODE_ERROR after a while, if they
 	// don't receive a feedback from the server.
 	// execute_reset_status();
+	set_highlighted(true);
 	std::cout << "---------- Executing Root ----------" << std::endl;
 	return child_status_ = first_child_->execute();
+	set_highlighted(false);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -253,6 +262,7 @@ NodeSelectorStar::NodeSelectorStar(Node* node)
 
 STATE NodeSelectorStar::execute()
 {
+	set_highlighted(true);
 	std::cout << "Executing Selector Star" << std::endl;
 
 	if (current_running_child_ == NULL) {
@@ -264,6 +274,7 @@ STATE NodeSelectorStar::execute()
 	do
 	{
 		child_status_ = exec_child_->execute();
+		set_highlighted(false);
 		if (child_status_ == NODE_ERROR)
 		{
 			current_running_child_ = exec_child_;
@@ -292,6 +303,7 @@ NodeSequenceStar::NodeSequenceStar(Node* node)
 
 STATE NodeSequenceStar::execute()
 {
+	set_highlighted(true);
 	std::cout << "Executing Sequence Star" << std::endl;
 
 	if (current_running_child_ == NULL) {
@@ -304,6 +316,7 @@ STATE NodeSequenceStar::execute()
 	do
 	{
 		child_status_ = exec_child_->execute();
+		set_highlighted(false);
 		if (child_status_ == NODE_ERROR)
 		{
 			current_running_child_ = exec_child_;
@@ -339,6 +352,9 @@ NodeROS::NodeROS(Node* node, std::string name)
 	ROS_INFO("Waiting for the corresponding actuator server to start.");
 	ac_.waitForServer();
 	ROS_INFO("Actuator server started successfully.");
+	received_ = false;
+	finished_ = false;
+	active_ = false;
 }
 
 void NodeROS::doneCb(const actionlib::SimpleClientGoalState& state,
@@ -358,6 +374,10 @@ void NodeROS::activeCb()
 {
 	std::cout << "active callback at Node: " << this << std::endl;
 	ROS_INFO("Goal just went active");
+	{
+		boost::lock_guard<boost::mutex> lock(mutex_active_);
+		active_ = true;
+	}
 }
 
 void NodeROS::feedbackCb(const behavior_trees::ROSFeedbackConstPtr& feedback)
@@ -365,31 +385,47 @@ void NodeROS::feedbackCb(const behavior_trees::ROSFeedbackConstPtr& feedback)
 	std::cout << "Callback Feedback at Node: " << this << std::endl;
 	ROS_INFO("Got Feedback status: %i", feedback->FEEDBACK_);
 	// std::cout << "%%% cb var: " << node_status_ << std::endl;
-	// boost::lock_guard<boost::mutex> lock(mutex_node_status_);
-	node_status_ = (STATE) feedback->FEEDBACK_;
-	received_ = true;
+	{
+		boost::lock_guard<boost::mutex> lock(mutex_node_status_);
+		node_status_ = (STATE) feedback->FEEDBACK_;
+	}
+	{
+		boost::lock_guard<boost::mutex> lock(mutex_received_);
+		received_ = true;
+	}
 }
 
 STATE NodeROS::execute()
 {
+	set_highlighted(true);
+	glut_process();
+	std::cout << "NodeROS::execute()" << std::endl;
 	if (overwritten_)
 	{
+		set_highlighted(false);
 		return node_status_ = FAILURE; //overwritten_result_;
 	}
 	else
 	{
 		bool finished;
-		received_ = false;
+		// received_ = false;
 		{
-			// boost::lock_guard<boost::mutex> lock(mutex_finished_);
+			boost::lock_guard<boost::mutex> lock(mutex_finished_);
 			finished = finished_;
 		}
-		if (!finished)
+
+		ROS_INFO("RECEIVED: %d", received_);
+		if (!finished && !received_)
 		{
 			std::cout << "Sending Goal Client: "
 			          << ros_node_name_ << std::endl;
 			behavior_trees::ROSGoal goal;
 			goal.GOAL_ = 1; // possitive tick
+
+			{
+				boost::lock_guard<boost::mutex> lock(mutex_active_);
+				active_ = false;
+			}
 
 			ac_.sendGoal(goal,
 			             boost::bind(&NodeROS::doneCb, this, _1, _2),
@@ -397,15 +433,21 @@ STATE NodeROS::execute()
 			             boost::bind(&NodeROS::feedbackCb, this, _1));
 
 			std::cout << "Waiting for Feedback at Node: " << this << std::endl;
-			while (!received_)
+			while (!received_ && !active_)
 			{
+				sleep(0.01);
 				// std::cout << "*";
 			}
 			std::cout << "Received Feedback at Node: " << this << std::endl;
 		}
 		{
-			// boost::lock_guard<boost::mutex> lock(mutex_node_status_);
+			boost::lock_guard<boost::mutex> lock(mutex_received_);
+			received_ = false;
+		}
+		{
+			boost::lock_guard<boost::mutex> lock(mutex_node_status_);
 			std::cout << "STATUS: " << node_status_ << std::endl;
+			set_highlighted(false);
 			return node_status_;
 		}
 	}
@@ -418,6 +460,7 @@ NodeCondition::NodeCondition(Node* node, std::string varlabel,
 
 STATE NodeCondition::execute()
 {
+	set_highlighted(true);
 	std::cout << "Executing Condition" << std::endl;
 
 	if (relation_.compare("="))
@@ -437,6 +480,7 @@ STATE NodeCondition::execute()
 	double val = global_varvalue.at(idx);
 	std::cout << "val" << val << std::endl;
 
+	set_highlighted(false);
 	switch (relation_.at(0))
 	{
 	case '=': return node_status_ = (val == std::stod(constant_))?
@@ -459,10 +503,12 @@ NodeDecorator::NodeDecorator(Node* node, std::string next_state,
 
 STATE NodeDecorator::execute()
 {
+	set_highlighted(true);
 	std::cout << "Executing Decorator" << std::endl;
 
 	exec_child_ = first_child_;
 	child_status_ = exec_child_->execute();
+	set_highlighted(false);
 
 	if (child_status_ == SUCCESS)
 	{
