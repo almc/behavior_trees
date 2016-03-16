@@ -65,12 +65,12 @@ int main(int argc, char** argv)
 	{
 		std::cout << "**** run" << run << std::endl;
 		std::cout << "-------------- EXECUTE TREE --------------" << std::endl;
-		root.execute_reset_status();
 		root.execute();			// sending tick
 		get_keypressed();		// processing keystrokes
 		process_keypressed();
 		glut_process();			// update visualization
 		glutPostRedisplay();
+		root.execute_reset_status();
 		ros::Duration(1.0/TICK_FREQUENCY).sleep();
 		std::cout << "**** run" << run << std::endl;
 	}

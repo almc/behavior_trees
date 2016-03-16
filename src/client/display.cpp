@@ -57,7 +57,7 @@ void draw_cursor(GLfloat x, GLfloat y)
 {
 	glLineWidth(3.0);
 	glBegin(GL_LINE_LOOP);
-	glColor3f(1.0, 1.0, 1.0);
+	glColor3f(1.0, 1.0, 0.0);
 	glVertex3f((GLfloat) (x + CURSOR_WIDTH), (GLfloat) (y - CURSOR_HEIGHT), (GLfloat) 0.0);
 	glVertex3f((GLfloat) (x + CURSOR_WIDTH), (GLfloat) (y + CURSOR_HEIGHT), (GLfloat) 0.0);
 	glVertex3f((GLfloat) (x - CURSOR_WIDTH), (GLfloat) (y + CURSOR_HEIGHT), (GLfloat) 0.0);

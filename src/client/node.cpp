@@ -160,12 +160,14 @@ NodeSelector::NodeSelector(Node* node)
 
 STATE NodeSelector::execute()
 {
+	set_highlighted(true);
 	std::cout << "Executing Selector" << std::endl;
 	exec_child_ = first_child_;
 	for (int i = 0; i < number_children_; i++)
 	{
 		std::cout << "ticking child: " << i << std::endl;
 		child_status_ = exec_child_->execute();
+		set_highlighted(false);
 
 		std::cout << "child status for comparison: " << child_status_ << std::endl;
 		if (child_status_ == NODE_ERROR)
@@ -187,11 +189,13 @@ NodeSequence::NodeSequence(Node* node)
 
 STATE NodeSequence::execute()
 {
+	set_highlighted(true);
 	std::cout << "Executing Sequence" << std::endl;
 	exec_child_ = first_child_;
 	for (int i = 0; i < number_children_; i++)
 	{
 		child_status_ = exec_child_->execute();
+		set_highlighted(false);
 		if (child_status_ == NODE_ERROR)
 			return node_status_ = NODE_ERROR;
 		else if (child_status_ == RUNNING)
@@ -208,6 +212,7 @@ NodeParallel::NodeParallel(Node* node)
 
 STATE NodeParallel::execute()
 {
+	set_highlighted(true);
 	int number_failure = 0;
 	int number_success = 0;
 	int number_error = 0;
@@ -216,6 +221,7 @@ STATE NodeParallel::execute()
 	for (int i = 0; i < number_children_; i++)
 	{
 		child_status_ = exec_child_->execute();
+		set_highlighted(false);
 		if (child_status_ == NODE_ERROR)
 			number_error++;
 		else if (child_status_ == FAILURE)
@@ -240,8 +246,10 @@ STATE NodeRoot::execute()
 	// have a timeout to become NODE_ERROR after a while, if they
 	// don't receive a feedback from the server.
 	// execute_reset_status();
+	set_highlighted(true);
 	std::cout << "---------- Executing Root ----------" << std::endl;
 	return child_status_ = first_child_->execute();
+	set_highlighted(false);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -254,6 +262,7 @@ NodeSelectorStar::NodeSelectorStar(Node* node)
 
 STATE NodeSelectorStar::execute()
 {
+	set_highlighted(true);
 	std::cout << "Executing Selector Star" << std::endl;
 
 	if (current_running_child_ == NULL) {
@@ -265,6 +274,7 @@ STATE NodeSelectorStar::execute()
 	do
 	{
 		child_status_ = exec_child_->execute();
+		set_highlighted(false);
 		if (child_status_ == NODE_ERROR)
 		{
 			current_running_child_ = exec_child_;
@@ -293,6 +303,7 @@ NodeSequenceStar::NodeSequenceStar(Node* node)
 
 STATE NodeSequenceStar::execute()
 {
+	set_highlighted(true);
 	std::cout << "Executing Sequence Star" << std::endl;
 
 	if (current_running_child_ == NULL) {
@@ -305,6 +316,7 @@ STATE NodeSequenceStar::execute()
 	do
 	{
 		child_status_ = exec_child_->execute();
+		set_highlighted(false);
 		if (child_status_ == NODE_ERROR)
 		{
 			current_running_child_ = exec_child_;
@@ -385,9 +397,12 @@ void NodeROS::feedbackCb(const behavior_trees::ROSFeedbackConstPtr& feedback)
 
 STATE NodeROS::execute()
 {
+	set_highlighted(true);
+	glut_process();
 	std::cout << "NodeROS::execute()" << std::endl;
 	if (overwritten_)
 	{
+		set_highlighted(false);
 		return node_status_ = FAILURE; //overwritten_result_;
 	}
 	else
@@ -432,6 +447,7 @@ STATE NodeROS::execute()
 		{
 			boost::lock_guard<boost::mutex> lock(mutex_node_status_);
 			std::cout << "STATUS: " << node_status_ << std::endl;
+			set_highlighted(false);
 			return node_status_;
 		}
 	}
@@ -444,6 +460,7 @@ NodeCondition::NodeCondition(Node* node, std::string varlabel,
 
 STATE NodeCondition::execute()
 {
+	set_highlighted(true);
 	std::cout << "Executing Condition" << std::endl;
 
 	if (relation_.compare("="))
@@ -463,6 +480,7 @@ STATE NodeCondition::execute()
 	double val = global_varvalue.at(idx);
 	std::cout << "val" << val << std::endl;
 
+	set_highlighted(false);
 	switch (relation_.at(0))
 	{
 	case '=': return node_status_ = (val == std::stod(constant_))?
@@ -485,10 +503,12 @@ NodeDecorator::NodeDecorator(Node* node, std::string next_state,
 
 STATE NodeDecorator::execute()
 {
+	set_highlighted(true);
 	std::cout << "Executing Decorator" << std::endl;
 
 	exec_child_ = first_child_;
 	child_status_ = exec_child_->execute();
+	set_highlighted(false);
 
 	if (child_status_ == SUCCESS)
 	{

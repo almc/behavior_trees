@@ -73,6 +73,8 @@ void ROSAction::goalCB()
 	goal_ = as_.acceptNewGoal()->GOAL_;
 	std::cout << "Received Goal: " << goal_ << std::endl;
 
+	// send_feedback();
+
 	// if (!busy)
 	// {
 	// 	feedback_.FEEDBACK_ = NODE_ERROR;
@@ -110,8 +112,6 @@ void ROSAction::goalCB()
 			{}
 		}
 	}
-
-	send_feedback();
 
 	if (feedback_.FEEDBACK_ == SUCCESS ||
 	    feedback_.FEEDBACK_ == FAILURE)
