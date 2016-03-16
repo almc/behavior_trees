@@ -211,9 +211,12 @@ private:
 	std::string ros_node_name_;
 	bool finished_;
 	bool received_;
+	bool active_;
 	actionlib::SimpleActionClient<behavior_trees::ROSAction> ac_;
 	boost::mutex mutex_node_status_;
 	boost::mutex mutex_finished_;
+	boost::mutex mutex_received_;
+	boost::mutex mutex_active_;
 };
 
 class NodeCondition : public Node

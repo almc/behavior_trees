@@ -56,7 +56,7 @@ void ROSAction::executionThread()
 	}
 	std::cout << "About to Destroy Thread" << std::endl;
 	// set_feedback(NODE_ERROR);
-	// send_feedback();
+	send_feedback();
 	std::cout << "----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
 	stop();
 	// execution_thread_.join();
@@ -69,8 +69,6 @@ void ROSAction::goalCB()
 	// could add conditions to accept goal or not
 	goal_ = as_.acceptNewGoal()->GOAL_;
 	std::cout << "Received Goal: " << goal_ << std::endl;
-
-	send_feedback();
 
 	// if (!busy)
 	// {
@@ -106,12 +104,15 @@ void ROSAction::goalCB()
 			{}
 		}
 	}
+	send_feedback();
 	if (feedback_.FEEDBACK_ == SUCCESS ||
 	    feedback_.FEEDBACK_ == FAILURE)
 	{
 		feedback_.FEEDBACK_ = NODE_ERROR;
 		result_.RESULT_     = NODE_ERROR;
 	}
+
+	std::cout << "****************************%%%%%%%%%% goalCB Exit%%%%%%%%%%" << std::endl;
 }
 
 // called each time a goal is preempted
