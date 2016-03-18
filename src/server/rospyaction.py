@@ -31,8 +31,10 @@ class ROSPYAction(object):
         Starts the actionlib simple action server
         """
         # "protected" variables definition
-        self._feedback = NODE_ERROR
-        self._result = NODE_ERROR
+        self._feedback = behavior_trees.msg.ROSFeedback()
+        self._feedback.FEEDBACK_ = NODE_ERROR
+        self._feedback = behavior_trees.msg.ROSResult()
+        self._result.RESULT_ = NODE_ERROR
         self._start_time = rospy.Time.now()
         self._elapsed_time = rospy.Duration(0)
         self._action_name = name
@@ -64,7 +66,8 @@ class ROSPYAction(object):
         self._goal = self._as.accept_new_goal()
         print "Received Goal"
 
-        if self._feedback != SUCCESS and self._feedback != FAILURE:
+        if self._feedback.FEEDBACK_ != SUCCESS and\
+                self._feedback.FEEDBACK_ != FAILURE:
             self._mutex_started.acquire()
             started = self._started
             self._mutex_started.release()
@@ -82,7 +85,7 @@ class ROSPYAction(object):
             self._mutex_feedback.release()
 
             self._mutex_result.acquire()
-            self._feedback.RESULT_ = NODE_ERROR
+            self._result.RESULT_ = NODE_ERROR
             self._mutex_result.release()
 
         print "%%%%%%%%%% goalCB Exit%%%%%%%%%%"
