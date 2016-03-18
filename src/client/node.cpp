@@ -346,6 +346,9 @@ void NodeROS::feedbackCb(const behavior_trees::ROSFeedbackConstPtr &feedback) {
 STATE NodeROS::execute() {
   set_highlighted(true);
   glut_process();
+  behavior_trees::ROSGoal goal;
+  goal.GOAL_ = 1; // possitive tick
+
   std::cout << "NodeROS::execute()" << std::endl;
   if (overwritten_) {
     set_highlighted(false);
@@ -361,8 +364,6 @@ STATE NodeROS::execute() {
     ROS_INFO("RECEIVED: %d", received_);
     if (!finished && !received_) {
       std::cout << "Sending Goal Client: " << ros_node_name_ << std::endl;
-      behavior_trees::ROSGoal goal;
-      goal.GOAL_ = 1; // possitive tick
 
       {
         boost::lock_guard<boost::mutex> lock(mutex_active_);
@@ -383,6 +384,7 @@ STATE NodeROS::execute() {
       boost::lock_guard<boost::mutex> lock(mutex_node_status_);
       if (node_status_ == RUNNING) {
         // We need to tick again to keep the node alive while running!
+        std::cout << "Sending Goal Client: " << ros_node_name_ << std::endl;
         ac_.sendGoal(goal, boost::bind(&NodeROS::doneCb, this, _1, _2),
                      boost::bind(&NodeROS::activeCb, this),
                      boost::bind(&NodeROS::feedbackCb, this, _1));
