@@ -61,7 +61,7 @@ class ROSPYAction(object):
         """
         print "%%%%%%%%%% goalCB %%%%%%%%%%"
         self._goal = self._as.accept_new_goal()
-        print "Received Goal: %d" % self._goal
+        print "Received Goal"
 
         if self._feedback != SUCCESS and self._feedback != FAILURE:
             self._mutex_started.acquire()
