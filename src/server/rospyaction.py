@@ -49,8 +49,8 @@ class ROSPYAction(object):
 
         self._as = actionlib.SimpleActionServer(self._action_name,
                                                 behavior_trees.msg.ROSAction,
-                                                execute_cb=self.goal_cb,
                                                 auto_start=False)
+        self._as.register_goal_callback(self._goal_cb)
         self._as.start()
 
     def goal_cb(self, goal):
