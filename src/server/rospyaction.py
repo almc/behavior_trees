@@ -178,7 +178,7 @@ class ROSPYAction(object):
 
         while self.is_active() and not rospy.is_shutdown():
             print "current_thread(): %d"\
-                   % threading.current_thread()
+                   % threading.current_thread().ident
 
             active = self.timeout_check()
             print "im active: %d" % active
