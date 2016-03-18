@@ -344,6 +344,8 @@ void NodeROS::feedbackCb(const behavior_trees::ROSFeedbackConstPtr &feedback) {
 }
 
 void NodeROS::sendGoal() {
+  behavior_trees::ROSGoal goal;
+  goal.GOAL_ = 1; // possitive tick
   std::cout << "Sending Goal Client: " << ros_node_name_ << std::endl;
 
   {
@@ -359,8 +361,6 @@ void NodeROS::sendGoal() {
 STATE NodeROS::execute() {
   set_highlighted(true);
   glut_process();
-  behavior_trees::ROSGoal goal;
-  goal.GOAL_ = 1; // possitive tick
 
   std::cout << "NodeROS::execute()" << std::endl;
   if (overwritten_) {
