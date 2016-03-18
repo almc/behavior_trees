@@ -1,49 +1,43 @@
-#! /usr/bin/env python
+"""Template server file.
 
-import roslib; roslib.load_manifest('behavior_trees')
+Provides an example of a python behavior trees server
+"""
+# ! /usr/bin/env python
+
+import roslib
 import rospy
-import actionlib
-import behavior_trees.msg
-# import actionlib_tutorials.msg
+from rospyaction import ROSPYAction, RUNNING, FAILURE, SUCCESS
+roslib.load_manifest('behavior_trees')
 
-class ROSAction(object):
-  # create messages that are used to publish feedback/result
-  _feedback = behavior_trees.msg.ROSFeedback()
-  _result   = behavior_trees.msg.ROSResult()
 
-  def __init__(self, name):
-    self._action_name = name
-    self._as = actionlib.SimpleActionServer(self._action_name, behavior_trees.msg.ROSAction, execute_cb=self.goal_cb, auto_start = False)
-    self._as.start()
+class ActionName(ROSPYAction):
+    """Class definition implementing the functions execute_cb and reset_cb."""
 
-  def goal_cb(self, goal):
-    r = rospy.Rate(100)
-    success = True
-    self._feedback.FEEDBACK_ = 0
-    # self._as.publish_feedback(self._feedback)
+    def __init__(self, name):
+        """ActionName constructor."""
+        ROSPYAction.__init__(name)
+        self._time_to_complete = rospy.Duration(0)
 
-    rospy.loginfo('action_name: %s, goal: %i' % (self._action_name, goal.GOAL_))
-    for i in xrange(1, 2000):
-      rospy.loginfo('i: %i' % i)
-      if rospy.is_shutdown():
-        # rospy.loginfo('aborting through ros')
-        break
-      if self._as.is_preempt_requested():
-        rospy.loginfo('%s: Preempted' % self._action_name)
-        # self._as.set_preempted()
-        # break
-      else:
-        # publish the feedback
-        self._as.publish_feedback(self._feedback)
-        r.sleep()
+    def execute_cb(self, dt):
+        """Run the action logic."""
+        print "Executing Main Task, elapsed_time: %f" % dt.to_sec()
 
-    rospy.loginfo('sending feedback')
-    self._feedback.FEEDBACK_ = 2
-    self._as.publish_feedback(self._feedback)
+        self._time_to_complete = self._time_to_complete + dt
 
+        if self._time_to_complete.to_sec() < 5:
+            self._set_feedback(RUNNING)
+            return 0  # Returning 0 keeps the action alive
+
+        else:
+            self._set_feedback(SUCCESS)
+            return 1
+
+    def reset_cb(self):
+        """Reset the action time."""
+        self._time_to_complete = rospy.Duration(0)
 
 if __name__ == '__main__':
-  rospy.init_node('action_name_default')
-  ROSAction(rospy.get_name())
-  rospy.loginfo('starting node %s' % rospy.get_name() )
-  rospy.spin()
+    rospy.init_node('action_name_default')
+    ActionName(rospy.get_name())
+    rospy.loginfo('starting node %s' % rospy.get_name())
+    rospy.spin()

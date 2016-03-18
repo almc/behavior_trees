@@ -12,6 +12,14 @@ from threading import Thread, Lock
 
 roslib.load_manifest('behavior_trees')
 
+FAILURE = 0
+SUCCESS = 1
+RUNNING = 2
+NODE_ERROR = 3
+
+TIMEOUT_THRESHOLD = 2.0
+EXECUTION_FREQUENCY = 10.0
+
 
 class ROSPYAction(object):
     """Create messages that are used to publish feedback/result."""
