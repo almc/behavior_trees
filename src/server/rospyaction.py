@@ -8,6 +8,7 @@ import roslib
 import rospy
 import actionlib
 import behavior_trees.msg
+import threading
 from threading import Thread, Lock
 
 roslib.load_manifest('behavior_trees')
@@ -176,8 +177,8 @@ class ROSPYAction(object):
         self._mutex_start_time.release()
 
         while self.is_active() and not rospy.is_shutdown():
-            print "self._execution_thread.current_thread(): %d"\
-                   % self._execution_thread.current_thread()
+            print "current_thread(): %d"\
+                   % threading.current_thread()
 
             active = self.timeout_check()
             print "im active: %d" % active
