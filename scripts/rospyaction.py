@@ -54,6 +54,7 @@ class ROSPYAction(object):
                                                 behavior_trees.msg.ROSAction,
                                                 auto_start=False)
         self._as.register_goal_callback(self.goal_cb)
+        self._as.register_preempt_callback(self.preempt_cb)
         self._as.start()
 
     def goal_cb(self):
@@ -94,8 +95,14 @@ class ROSPYAction(object):
 
         print "%%%%%%%%%% goalCB Exit%%%%%%%%%%"
 
+    def preempt_cb(self):
+        """Preempt the action."""
+        print "%%%%%%%%%% preemptCB %%%%%%%%%%"
+        self.reset_timeout()
+
     def reset_timeout(self):
         """Call this method when a tick is received."""
+        print "reseting timeout"
         self._mutex_start_time.acquire()
         self._start_time = rospy.Time.now()
         self._mutex_start_time.release()

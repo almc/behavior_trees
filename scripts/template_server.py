@@ -4,8 +4,8 @@ Provides an example of a python behavior trees server
 """
 # ! /usr/bin/env python
 
-import roslib
 import rospy
+import roslib
 from rospyaction import ROSPYAction, RUNNING, FAILURE, SUCCESS
 roslib.load_manifest('behavior_trees')
 

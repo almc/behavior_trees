@@ -24,14 +24,14 @@ public:
 
 			time_to_complete_ += dt;
 
-			if (time_to_complete_.toSec() < 5)
+			if (time_to_complete_.toSec() < 1.5)
 			{
 				set_feedback(RUNNING);
 				// feedback_.FEEDBACK_ = RUNNING;
 				// as_.publishFeedback(feedback_);
 				return 0;		// 'allows' this thread to continue running
 			}
-			else if (time_to_complete_.toSec() >= 5)
+			else if (time_to_complete_.toSec() >= 1.5)
 			{
 				set_feedback(SUCCESS);
 				// set_feedback(FAILURE);
