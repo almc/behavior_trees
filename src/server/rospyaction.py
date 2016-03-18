@@ -156,6 +156,13 @@ class ROSPYAction(object):
         self._feedback.FEEDBACK_ = state
         self._mutex_feedback.release()
 
+    def is_active(self):
+        """Return the active flag value."""
+        self._mutex_active.acquire()
+        active = self._active
+        self._mutex_active.release()
+        return active
+
     def execution_thread(self):
         """Implement the logic for the execute callback.
 
@@ -168,7 +175,7 @@ class ROSPYAction(object):
         t0 = self._start_time
         self._mutex_start_time.release()
 
-        while self._is_active and not rospy.is_shutdown():
+        while self.is_active() and not rospy.is_shutdown():
             print "self._execution_thread.current_thread(): %d"\
                    % self._execution_thread.current_thread()
 
