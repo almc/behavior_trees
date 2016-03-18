@@ -37,6 +37,7 @@ class ROSPYAction(object):
         self._mutex_elapsed_time = Lock()
         self._mutex_feedback = Lock()
         self._mutex_result = Lock()
+        self._execution_thread = None
 
         self._as = actionlib.SimpleActionServer(self._action_name,
                                                 behavior_trees.msg.ROSAction,
@@ -98,8 +99,8 @@ class ROSPYAction(object):
         print "Starting Thread Now"
         print "++++++++++++++++++++++++++++++++++++++++++++++"
 
-        execution_thread = Thread(target=self._execution_thread)
-        execution_thread.start()
+        self._execution_thread = Thread(target=self.execution_thread)
+        self._execution_thread.start()
 
     def stop(self):
         """Stop the execution thread."""
@@ -146,3 +147,47 @@ class ROSPYAction(object):
         self._mutex_feedback.acquire()
         self._feedback.FEEDBACK_ = state
         self._mutex_feedback.release()
+
+    def execution_thread(self):
+        """Implement the logic for the execute callback.
+
+        Thread that runs the execute callback for the server.
+        Implements extra logic for timming out.
+        """
+        r = rospy.Rate(EXECUTION_FREQUENCY)
+        self._mutex_start_time.acquire()
+        self._start_time = rospy.Time.now()
+        t0 = self._start_time
+        self._mutex_start_time.release()
+
+        while self._is_active and not rospy.is_shutdown():
+            print "self._execution_thread.current_thread(): %d"\
+                   % self._execution_thread.current_thread()
+
+            active = self.timeout_check()
+            print "im active: %d" % active
+            self._mutex_active.acquire()
+            if active:
+                active = self._active
+
+            self._active = active
+            self._mutex_active.release()
+
+            if active:
+                dt = rospy.Time.now() - t0
+                t0 = rospy.Time.now()
+                print "executing cb %f" % dt
+
+                if self.execute_cb(dt):
+                    print "callback returned!"
+                    break
+
+            else:
+                print "self._execution_thread is not active"
+
+            r.sleep()
+
+        print "About to Destroy Thread"
+        print "-----------------------"
+        self.send_feedback()
+        self.stop()
