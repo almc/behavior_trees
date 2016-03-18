@@ -202,6 +202,8 @@ class ROSPYAction(object):
                     print "callback returned!"
                     break
 
+                self.send_feedback()
+
             else:
                 print "self._execution_thread is not active"
 
