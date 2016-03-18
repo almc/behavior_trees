@@ -379,7 +379,16 @@ STATE NodeROS::execute() {
         // std::cout << "*";
       }
       std::cout << "Received Feedback at Node: " << this << std::endl;
+    } else {
+      boost::lock_guard<boost::mutex> lock(mutex_node_status_);
+      if (node_status_ == RUNNING) {
+        // We need to tick again to keep the node alive while running!
+        ac_.sendGoal(goal, boost::bind(&NodeROS::doneCb, this, _1, _2),
+                     boost::bind(&NodeROS::activeCb, this),
+                     boost::bind(&NodeROS::feedbackCb, this, _1));
+      }
     }
+
     {
       boost::lock_guard<boost::mutex> lock(mutex_received_);
       received_ = false;
