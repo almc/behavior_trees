@@ -25,11 +25,11 @@ class ActionName(ROSPYAction):
         self._time_to_complete = self._time_to_complete + dt
 
         if self._time_to_complete.to_sec() < 5:
-            self._set_feedback(RUNNING)
+            self.set_feedback(RUNNING)
             return 0  # Returning 0 keeps the action alive
 
         else:
-            self._set_feedback(SUCCESS)
+            self.set_feedback(SUCCESS)
             return 1
 
     def reset_cb(self):
