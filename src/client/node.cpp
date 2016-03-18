@@ -375,12 +375,18 @@ STATE NodeROS::execute() {
                    boost::bind(&NodeROS::feedbackCb, this, _1));
 
       std::cout << "Waiting for Feedback at Node: " << this << std::endl;
-      while (!received_ || !active_) {
+      while (!received_) {
         sleep(0.01);
         // std::cout << "*";
       }
       std::cout << "Received Feedback at Node: " << this << std::endl;
     } else {
+
+      {
+        boost::lock_guard<boost::mutex> lock(mutex_active_);
+        active_ = false;
+      }
+
       boost::lock_guard<boost::mutex> lock(mutex_node_status_);
       if (node_status_ == RUNNING) {
         // We need to tick again to keep the node alive while running!
@@ -389,6 +395,12 @@ STATE NodeROS::execute() {
                      boost::bind(&NodeROS::activeCb, this),
                      boost::bind(&NodeROS::feedbackCb, this, _1));
       }
+    }
+
+    // To ensure synchronization between client and server
+    while (!active_) {
+      sleep(0.01);
+      // std::cout << "*";
     }
 
     {
