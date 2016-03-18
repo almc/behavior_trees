@@ -53,7 +53,7 @@ class ROSPYAction(object):
         self._as.register_goal_callback(self.goal_cb)
         self._as.start()
 
-    def goal_cb(self, goal):
+    def goal_cb(self):
         """Implement the callback logic.
 
         When the actionlib client sends a goal, this
