@@ -358,57 +358,102 @@ void NodeROS::sendGoal() {
                boost::bind(&NodeROS::feedbackCb, this, _1));
 }
 
-STATE NodeROS::execute() {
-  set_highlighted(true);
-  glut_process();
+// STATE NodeROS::execute() {
+//   set_highlighted(true);
+//   glut_process();
+//
+//   std::cout << "NodeROS::execute()" << std::endl;
+//   if (overwritten_) {
+//     set_highlighted(false);
+//     return node_status_ = FAILURE; // overwritten_result_;
+//   } else {
+//     bool finished;
+//     {
+//       boost::lock_guard<boost::mutex> lock(mutex_finished_);
+//       finished = finished_;
+//     }
+//
+//     ROS_INFO("RECEIVED: %d", received_);
+//     if ((!finished && !received_)) {
+//
+//       sendGoal();
+//       std::cout << "Waiting for Feedback at Node: " << this << std::endl;
+//       while (!received_ || !active_) {
+//         sleep(0.01);
+//         // std::cout << "*";
+//       }
+//       std::cout << "Received Feedback at Node: " << this << std::endl;
+//     }
+//
+//     {
+//       boost::lock_guard<boost::mutex> lock(mutex_received_);
+//       received_ = false;
+//     }
+//     {
+//       boost::lock_guard<boost::mutex> lock(mutex_node_status_);
+//       std::cout << "STATUS: " << node_status_ << std::endl;
+//       set_highlighted(false);
+//       return node_status_;
+//     }
+//   }
+// }
 
-  std::cout << "NodeROS::execute()" << std::endl;
-  if (overwritten_) {
-    set_highlighted(false);
-    return node_status_ = FAILURE; // overwritten_result_;
-  } else {
-    bool finished;
-    // received_ = false;
-    {
-      boost::lock_guard<boost::mutex> lock(mutex_finished_);
-      finished = finished_;
-    }
+STATE NodeROS::execute()
+{
+   set_highlighted(true);
+   glut_process();
+   std::cout << "NodeROS::execute()" << std::endl;
+   if (overwritten_)
+   {
+           set_highlighted(false);
+           return node_status_ = FAILURE; //overwritten_result_;
+   }
+   else
+   {
+           bool finished;
+           // received_ = false;
+           {
+                   boost::lock_guard<boost::mutex> lock(mutex_finished_);
+                   finished = finished_;
+           }
 
-    ROS_INFO("RECEIVED: %d", received_);
-    if (!finished && !received_) {
+           ROS_INFO("RECEIVED: %d", received_);
+           if (!finished && !received_)
+           {
+                   std::cout << "Sending Goal Client: "
+                             << ros_node_name_ << std::endl;
+                   behavior_trees::ROSGoal goal;
+                   goal.GOAL_ = 1; // possitive tick
 
-      sendGoal();
+                   {
+                           boost::lock_guard<boost::mutex> lock(mutex_active_);
+                           active_ = false;
+                   }
 
-      std::cout << "Waiting for Feedback at Node: " << this << std::endl;
-      while (!received_) {
-        sleep(0.01);
-        // std::cout << "*";
-      }
-      std::cout << "Received Feedback at Node: " << this << std::endl;
-    } else {
-      if (node_status_ == RUNNING) {
-        // We need to tick again to keep the node alive while running!
-        sendGoal();
-      }
-    }
+                   ac_.sendGoal(goal,
+                                boost::bind(&NodeROS::doneCb, this, _1, _2),
+                                boost::bind(&NodeROS::activeCb, this),
+                                boost::bind(&NodeROS::feedbackCb, this, _1));
 
-    // To ensure synchronization between client and server
-    while (!active_) {
-      sleep(0.01);
-      // std::cout << "*";
-    }
-
-    {
-      boost::lock_guard<boost::mutex> lock(mutex_received_);
-      received_ = false;
-    }
-    {
-      boost::lock_guard<boost::mutex> lock(mutex_node_status_);
-      std::cout << "STATUS: " << node_status_ << std::endl;
-      set_highlighted(false);
-      return node_status_;
-    }
-  }
+                   std::cout << "Waiting for Feedback at Node: " << this << std::endl;
+                   while (!received_ && !active_)
+                   {
+                           sleep(0.01);
+                           // std::cout << "*";
+                   }
+                   std::cout << "Received Feedback at Node: " << this << std::endl;
+           }
+           {
+                   boost::lock_guard<boost::mutex> lock(mutex_received_);
+                   received_ = false;
+           }
+           {
+                   boost::lock_guard<boost::mutex> lock(mutex_node_status_);
+                   std::cout << "STATUS: " << node_status_ << std::endl;
+                   set_highlighted(false);
+                   return node_status_;
+           }
+   }
 }
 
 NodeCondition::NodeCondition(Node *node, std::string varlabel,

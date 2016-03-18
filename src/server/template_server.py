@@ -24,7 +24,7 @@ class ActionName(ROSPYAction):
 
         self._time_to_complete = self._time_to_complete + dt
 
-        if self._time_to_complete.to_sec() < 5:
+        if self._time_to_complete.to_sec() < 1.5:
             self.set_feedback(RUNNING)
             return 0  # Returning 0 keeps the action alive
 
