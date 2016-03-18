@@ -72,9 +72,9 @@ class ROSPYAction(object):
 
             # the python server will only assume positive ticks
             if started:
-                self._reset_timeout()
+                self.reset_timeout()
             else:
-                self._start()
+                self.start()
         else:
             self._mutex_feedback.acquire()
             self._feedback.FEEDBACK_ = NODE_ERROR
