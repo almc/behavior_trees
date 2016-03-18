@@ -82,6 +82,8 @@ class ROSPYAction(object):
 
         if self._feedback.FEEDBACK_ == SUCCESS or\
            self._feedback.FEEDBACK_ == FAILURE:
+
+           print "returned %d, setting NODE_ERROR" % self._feedback.FEEDBACK_
             self._mutex_feedback.acquire()
             self._feedback.FEEDBACK_ = NODE_ERROR
             self._mutex_feedback.release()
