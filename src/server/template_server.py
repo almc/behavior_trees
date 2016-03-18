@@ -34,6 +34,7 @@ class ActionName(ROSPYAction):
 
     def reset_cb(self):
         """Reset the action time."""
+        print "Executing the reset callback"
         self._time_to_complete = rospy.Duration(0)
 
 if __name__ == '__main__':

@@ -153,6 +153,7 @@ class ROSPYAction(object):
         print "Sending Feedback: %d" % self._feedback.FEEDBACK_
         self._as.publish_feedback(self._feedback)
         self._mutex_feedback.release()
+        print "Sent feedback"
 
     def set_feedback(self, state):
         """Set the action feedback."""
