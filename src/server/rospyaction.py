@@ -33,7 +33,7 @@ class ROSPYAction(object):
         # "protected" variables definition
         self._feedback = behavior_trees.msg.ROSFeedback()
         self._feedback.FEEDBACK_ = NODE_ERROR
-        self._feedback = behavior_trees.msg.ROSResult()
+        self._result = behavior_trees.msg.ROSResult()
         self._result.RESULT_ = NODE_ERROR
         self._start_time = rospy.Time.now()
         self._elapsed_time = rospy.Duration(0)
