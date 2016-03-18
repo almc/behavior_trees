@@ -192,7 +192,7 @@ class ROSPYAction(object):
             if active:
                 dt = rospy.Time.now() - t0
                 t0 = rospy.Time.now()
-                print "executing cb %f" % dt
+                print "executing cb %f" % dt.to_sec()
 
                 if self.execute_cb(dt):
                     print "callback returned!"
