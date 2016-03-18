@@ -79,7 +79,9 @@ class ROSPYAction(object):
                 self.reset_timeout()
             else:
                 self.start()
-        else:
+
+        if self._feedback.FEEDBACK_ == SUCCESS or\
+           self._feedback.FEEDBACK_ == FAILURE:
             self._mutex_feedback.acquire()
             self._feedback.FEEDBACK_ = NODE_ERROR
             self._mutex_feedback.release()
