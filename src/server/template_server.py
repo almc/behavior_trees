@@ -15,7 +15,7 @@ class ActionName(ROSPYAction):
 
     def __init__(self, name):
         """ActionName constructor."""
-        ROSPYAction.__init__(name)
+        ROSPYAction.__init__(self, name)
         self._time_to_complete = rospy.Duration(0)
 
     def execute_cb(self, dt):
