@@ -146,10 +146,10 @@ file(GLOB_RECURSE SRC ${PROJECT_SOURCE_DIR}/src/client/*.cpp)
 add_executable(${PROJECT_NAME} ${SRC})
 target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
-add_executable(template_server src/server/template_server.cpp src/client/rosaction.cpp src/client/robot_config.cpp)
+add_executable(template_server src/server/template_server.cpp src/server/rosaction.cpp src/client/robot_config.cpp)
 target_link_libraries(template_server ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
-add_library(bt_server STATIC ${PROJECT_SOURCE_DIR}/src/client/rosaction.cpp)
+add_library(bt_server STATIC ${PROJECT_SOURCE_DIR}/src/server/rosaction.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
