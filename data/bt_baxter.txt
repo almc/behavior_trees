@@ -1,4 +1,6 @@
 [*
+	A bt_status_action_go_home
+	A bt_move_action
 	A bt_status_action_init
 	A bt_look_for_object_action
 	A bt_move_action
