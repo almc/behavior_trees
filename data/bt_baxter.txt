@@ -3,6 +3,7 @@
 	A bt_look_for_object_action
 	A bt_move_action
 	A bt_pick_action
+	A bt_status_action_pick_successful
 	A bt_move_action
 	A bt_place_action
 	A bt_status_action_finish
