@@ -1,15 +1,9 @@
 [*
 	A bt_status_action_init
-	A get_bin_pose_action
-	A move_action
-	{*
-		[*
-			A grasp_item_action
-			A bt_status_action_successful_grasp
-		]
-		A bt_status_action_fail_grasp
-	}
-	A get_bin_pose_action
-	A move_action
-	A bt_status_action_finished_pick
+	A bt_look_for_object_action
+	A bt_move_action
+	A bt_pick_action
+	A bt_move_action
+	A bt_place_action
+	A bt_status_action_finish
 ]
