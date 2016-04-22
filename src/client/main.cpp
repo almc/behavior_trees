@@ -56,9 +56,9 @@ int main(int argc, char** argv)
 	root.print_subtree();
 
 	// wait until user inputs a key + Enter to start (space + Enter does not work)
-	int key;
-	std::cout << "Press Key To Start" << std::endl;
-	std::cin >> key;
+	// int key;
+	// std::cout << "Press Key To Start" << std::endl;
+	// std::cin >> key;
 
 	// start ticking the root of the tree at frequency: TICK_FREQUENCY
 	while (ros::ok())
