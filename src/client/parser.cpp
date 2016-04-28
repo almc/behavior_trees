@@ -87,7 +87,7 @@ int process_substring(std::string sub)
 int parse_file(std::string name)
 {
   std::string line;
-  std::string path = ros::package::getPath("bt_launcher");
+  std::string path = ros::package::getPath("apc_bt_launcher");
   std::ifstream file(path + "/data/" + name);
 
   if (!file.is_open())
