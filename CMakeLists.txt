@@ -51,7 +51,8 @@ add_action_files(
 # Generate added messages and services with any dependencies listed here
 generate_messages(
   DEPENDENCIES
-  actionlib_msgs std_msgs
+  actionlib_msgs
+  std_msgs
 )
 
 ###################################
@@ -79,10 +80,10 @@ include_directories(
 file(GLOB_RECURSE SRC ${PROJECT_SOURCE_DIR}/src/client/*.cpp)
 
 add_executable(${PROJECT_NAME} ${SRC})
-target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${catkin_LIBRARIES} ${Boost_LIBRARIES} X11)
 
 add_executable(template_server src/server/template_server.cpp src/server/rosaction.cpp src/client/robot_config.cpp)
-target_link_libraries(template_server ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(template_server ${catkin_LIBRARIES} ${Boost_LIBRARIES} X11)
 
 add_library(bt_server STATIC ${PROJECT_SOURCE_DIR}/src/server/rosaction.cpp)
 
