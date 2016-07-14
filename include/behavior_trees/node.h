@@ -200,6 +200,7 @@ public:
 	void activeCb();
 // called every time feedback is received for the goal
 	void feedbackCb(const behavior_trees::ROSFeedbackConstPtr& feedback);
+	void sendGoal();
 
 private:
 	inline NODE_TYPE get_node_type() { return ACTION; }

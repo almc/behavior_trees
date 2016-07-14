@@ -50,6 +50,7 @@ void ROSAction::executionThread()
 				std::cout << "callback returned!" << std::endl;
 				break;
 			}
+			send_feedback();
 		}
 		else
 		{
